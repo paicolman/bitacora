@@ -1,0 +1,27 @@
+.equipment-table-header{
+  background-color: #c0c0c0;
+  border:0.1px solid black;
+  font-size:medium;
+  font-weight: bold;
+  text-align: center;
+}
+.equipment-table{
+  border:0.1px solid black;
+  font-size:medium;
+}
+.equipment-def{
+  border-left: 0.1px solid black;
+  border-top: 0.1px solid black;
+  border-right: 0.1px solid black;
+}
+.equipment-rem{
+  border-left: 0.1px solid black;
+  border-bottom: 0.1px solid black;
+  border-right: 0.1px solid black;
+}
+.license{
+  font-weight: bold;
+}
+.license-list{
+  border-bottom: 0.1px solid grey;
+}

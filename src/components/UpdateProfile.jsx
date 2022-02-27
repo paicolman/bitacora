@@ -3,6 +3,7 @@ import { PilotDataContext } from '../contexts/PilotDataContext'
 import { useAuth } from "../contexts/AuthContext"
 import { LicensesList } from './LicensesList'
 import { Button, Form, Col, Container, Row, Card, FloatingLabel } from 'react-bootstrap'
+import EquipmentList from './EquipmentList'
 
 export default function UpdateProfile() {
 
@@ -32,28 +33,24 @@ export default function UpdateProfile() {
           </Card.Body>
         </Card>
       </Row>
-      <Row className="pt-2">
-        <Col sm>
+      <Row>
+        <Col sm className='pt-2'>
           <FloatingLabel controlId='floatingName' label='Your Name' >
-            <Form.Control type='text' />
+            <Form.Control type='text' placeholder='Your Name'/>
           </FloatingLabel>
         </Col>
-        <Col sm>
+        <Col sm className='pt-2'>
           <FloatingLabel controlId='floatingFlyingSince' label='Flying since...' >
-            <Form.Control type='date' />
+            <Form.Control type='date'/>
           </FloatingLabel>
         </Col>
       </Row>
       <Row className="pt-2">
-        <Col sm>
+        <Col sm={5}>
           <LicensesList />
         </Col>
         <Col sm>
-          <Card>
-            <Card.Body>
-              fkjadhf
-            </Card.Body>
-          </Card>
+          <EquipmentList/>
         </Col>
       </Row>
     </Container>

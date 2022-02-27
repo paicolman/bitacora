@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { Button, Form, Col, Row, Card, FloatingLabel, InputGroup } from 'react-bootstrap'
-
+import '../css/bitacora.css'
 
 export function LicensesList() {
 
@@ -23,16 +23,17 @@ export function LicensesList() {
   }
 
   function handleDefaultLicense(e) {
-    const defIdx = e.target.id.split('-')[1]
-    const updateLicenses = [...licenses]
-    updateLicenses.map(updateLicence => {
-      return updateLicence.default = false
+    const defIdx = parseInt(e.target.id.split('-')[1])
+    const updateLicenses = licenses.map(updateLicence => {
+      updateLicence.default = false
+      return updateLicence
     })
     updateLicenses[defIdx].default = true
     setLicenses(updateLicenses)
   }
 
   function handleRemoveLicense(e) {
+    e.preventDefault()
     const removeIdx = parseInt(e.target.id.split('-')[1])
     const reducedlicences = licenses.filter((_, idx) => {
       return idx !== removeIdx 
@@ -49,20 +50,18 @@ export function LicensesList() {
   }
 
   function displayLicenses() {
-    let retval = []
-    licenses.map((license, index) => {
+    const retval = licenses.map((license, index) => {
       const licenseKey = `license-${index}`
       const defChekId = `defCheck-${index}`
       const remButKey = `remBut-${index}`
 
-      retval.push(
-        <Row className='pt-1'  key={licenseKey}>
-          <Col sm>{license.id}</Col>
-          <Col sm><Form.Check label='default' id={defChekId} checked={license.default} onChange={handleDefaultLicense}/></Col>
-          <Col sm className='text-end'><Button id={remButKey} variant='primary' size='sm' onClick={handleRemoveLicense}>remove</Button></Col>
+      return (
+        <Row className='license-list pt-1 pb-1'  key={licenseKey}>
+          <Col sm className='license text-center'>{license.id}</Col>
+          <Col sm className='text-center'><Form.Check inline label='default' id={defChekId} checked={license.default} onChange={handleDefaultLicense}/></Col>
+          <Col sm className='text-center'><Button id={remButKey} variant='danger' size='sm' onClick={handleRemoveLicense}>remove</Button></Col>
         </Row>
       )
-      return license
     })
     return retval
   }
