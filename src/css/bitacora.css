@@ -1,20 +1,20 @@
-.equipment-table-header{
+.glider-table-header{
   background-color: #c0c0c0;
   border:0.1px solid black;
   font-size:medium;
   font-weight: bold;
   text-align: center;
 }
-.equipment-table{
+.glider-table{
   border:0.1px solid black;
   font-size:medium;
 }
-.equipment-def{
+.glider-def{
   border-left: 0.1px solid black;
   border-top: 0.1px solid black;
   border-right: 0.1px solid black;
 }
-.equipment-rem{
+.glider-rem{
   border-left: 0.1px solid black;
   border-bottom: 0.1px solid black;
   border-right: 0.1px solid black;

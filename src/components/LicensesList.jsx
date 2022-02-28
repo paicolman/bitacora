@@ -1,23 +1,26 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useContext } from 'react'
 import { Button, Form, Col, Row, Card, FloatingLabel, InputGroup } from 'react-bootstrap'
+import { ProfileDataContext } from '../contexts/ProfileDataContext'
 import '../css/bitacora.css'
 
 export function LicensesList() {
 
+  const { updateLicenses } = useContext(ProfileDataContext)
   const [licenses, setLicenses] = useState([])
   const licensesInputRef = useRef()
 
   function handleAddLicence(e) {
     e.preventDefault()
     const newLicenseId = licensesInputRef.current.value
-    let isDefault = (licenses.length === 0)
+    const isDefault = (licenses.length === 0)
 
     if (newLicenseId !== '') {
       const newLicense = {
         id: newLicenseId,
         default: isDefault
       }
-      setLicenses(prevState => ([...prevState, newLicense]))
+      const prevState = [...licenses]
+      setLicenses([...prevState, newLicense])
     }
     licensesInputRef.current.value = ''
   }
@@ -36,7 +39,7 @@ export function LicensesList() {
     e.preventDefault()
     const removeIdx = parseInt(e.target.id.split('-')[1])
     const reducedlicences = licenses.filter((_, idx) => {
-      return idx !== removeIdx 
+      return idx !== removeIdx
     })
     if (reducedlicences.length > 0) {
       const defaultDeleted = reducedlicences.filter(license => {
@@ -56,41 +59,48 @@ export function LicensesList() {
       const remButKey = `remBut-${index}`
 
       return (
-        <Row className='license-list pt-1 pb-1'  key={licenseKey}>
+        <Row className='license-list pt-1 pb-1' key={licenseKey}>
           <Col sm className='license text-center'>{license.id}</Col>
-          <Col sm className='text-center'><Form.Check inline label='default' id={defChekId} checked={license.default} onChange={handleDefaultLicense}/></Col>
-          <Col sm className='text-center'><Button id={remButKey} variant='danger' size='sm' onClick={handleRemoveLicense}>remove</Button></Col>
+          <Col sm className='text-center'>
+            <Form.Check inline label='default' id={defChekId} checked={license.default} onChange={handleDefaultLicense} />
+          </Col>
+          <Col sm className='text-center'>
+            <Button id={remButKey} variant='danger' size='sm' onClick={handleRemoveLicense}>
+              remove
+            </Button>
+          </Col>
         </Row>
       )
     })
+    updateLicenses(licenses)
     return retval
   }
 
   return (
-    <Card>
-      <Card.Title className='text-center'>{' '}Licenses</Card.Title>
-      <Card.Body>
-        <Row>
-        <InputGroup className="mb-3">
-          <Col>
-            {displayLicenses()}
-          </Col>
-          </InputGroup>
-        </Row>
-        <Row className='pt-2'>
-          <Col sm={8}>
-            <FloatingLabel controlId='floatingAddLicence' label='Add License' >
-              <Form.Control ref={licensesInputRef} type='text' />
-            </FloatingLabel>
-          </Col>
-          <Col sm className='text-end'>
-            <Button variant='primary' onClick={handleAddLicence}>
-              Add
-            </Button>
-          </Col>
-        </Row>
-      </Card.Body>
-    </Card>
+      <Card>
+        <Card.Title className='text-center'>{' '}Licenses</Card.Title>
+        <Card.Body>
+          <Row>
+            <InputGroup className="mb-3">
+              <Col>
+                {displayLicenses()}
+              </Col>
+            </InputGroup>
+          </Row>
+          <Row className='pt-2'>
+            <Col sm={8}>
+              <FloatingLabel controlId='floatingAddLicence' label='Add License' >
+                <Form.Control ref={licensesInputRef} type='text' />
+              </FloatingLabel>
+            </Col>
+            <Col sm className='text-end pt-2'>
+              <Button variant='primary' onClick={handleAddLicence}>
+                Add
+              </Button>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
   )
 }
 
