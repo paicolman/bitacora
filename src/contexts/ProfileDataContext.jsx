@@ -54,17 +54,17 @@ export function ProfileDataProvider({ children }) {
 
   function initPilotLogBook() {
     const db = getDatabase(app)
-    const dbRef = ref(db, 'pilots')
-    const newPilotRef = child(dbRef, currentUser.uid)
-    set(newPilotRef, {profile:null})
+    const dbRef = ref(db)
+    //const newPilotRef = child(dbRef, currentUser.uid)
+    //set(newPilotRef, {profile:null})
     console.log(currentUser.uid)
     onValue(dbRef, (snapshot) => {
       const registeredPilots = Object.keys(snapshot.val())
       console.log(registeredPilots)
       const pilotExist = registeredPilots.filter(regPilot => { return regPilot === currentUser.uid }).length > 0
-
+      console.log(pilotExist)
       if (!pilotExist && !preventFlood) {
-        const newPilotRef = child(dbRef, `pilots/${currentUser.uid}`)
+        const newPilotRef = child(dbRef, `${currentUser.uid}`)
         set(newPilotRef, {
           name:userName,
           flyingSince: flyingSince,
