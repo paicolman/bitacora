@@ -1,7 +1,6 @@
 import React, { useState, useRef, useContext } from 'react'
 import { Button, Form, Col, Row, Card, FloatingLabel, InputGroup } from 'react-bootstrap'
-import { ProfileDataContext } from '../contexts/ProfileDataContext'
-import '../css/bitacora.css'
+import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 
 export function LicensesList() {
 
@@ -77,30 +76,30 @@ export function LicensesList() {
   }
 
   return (
-      <Card>
-        <Card.Title className='text-center'>{' '}Licenses</Card.Title>
-        <Card.Body>
-          <Row>
-            <InputGroup className="mb-3">
-              <Col>
-                {displayLicenses()}
-              </Col>
-            </InputGroup>
-          </Row>
-          <Row className='pt-2'>
-            <Col sm={8}>
-              <FloatingLabel controlId='floatingAddLicence' label='Add License' >
-                <Form.Control ref={licensesInputRef} type='text' />
-              </FloatingLabel>
+    <Card>
+      <Card.Title className='text-center'>{' '}Licenses</Card.Title>
+      <Card.Body>
+        <Row>
+          <InputGroup className="mb-3">
+            <Col>
+              {displayLicenses()}
             </Col>
-            <Col sm className='text-end pt-2'>
-              <Button variant='primary' onClick={handleAddLicence}>
-                Add
-              </Button>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+          </InputGroup>
+        </Row>
+        <Row className='pt-2'>
+          <Col sm={8}>
+            <FloatingLabel controlId='floatingAddLicence' label='Add License' >
+              <Form.Control ref={licensesInputRef} type='text' />
+            </FloatingLabel>
+          </Col>
+          <Col sm className='text-end pt-2'>
+            <Button variant='primary' onClick={handleAddLicence}>
+              Add
+            </Button>
+          </Col>
+        </Row>
+      </Card.Body>
+    </Card>
   )
 }
 

@@ -1,3 +1,7 @@
+div#root{
+  background-color:aliceblue;
+}
+
 .glider-table-header{
   background-color: #c0c0c0;
   border:0.1px solid black;
@@ -24,4 +28,21 @@
 }
 .license-list{
   border-bottom: 0.1px solid grey;
+}
+.licenses-container {
+  align-self: center;
+}
+.licenses-card{
+  width: 12rem;
+}
+.profile-container{
+  margin: 0.6rem 1rem;
+}
+.profile-pic {
+  max-width: 100%;
+}
+.rounded-box{
+  border-radius: 5px;
+  border: 0.5px solid #6c757d;
+  background-color: #f8f9fa;
 }

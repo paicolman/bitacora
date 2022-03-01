@@ -1,6 +1,6 @@
 import React, { useRef, useState, useContext } from 'react'
-import { ProfileDataContext } from '../contexts/ProfileDataContext'
-import { useAuth } from '../contexts/AuthContext'
+import { ProfileDataContext } from '../../contexts/ProfileDataContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { LicensesList } from './LicensesList'
 import { Button, Form, Col, Container, Row, Card, FloatingLabel, Alert } from 'react-bootstrap'
 import GliderList from './GliderList'
@@ -9,7 +9,7 @@ export default function UpdateProfile() {
 
   // const { initPilotLogBook } = useContext(PilotDataContext)
   const { getLicenses, getGliders, setUserName, setFlyingSince, initPilotLogBook } = useContext(ProfileDataContext)
-  const { currentUser } = useAuth()
+  const { currentUser, logout } = useAuth()
   const userNameRef = useRef()
   const flyingSinceRef = useRef()
   const userNameColRef = useRef()
@@ -52,8 +52,13 @@ export default function UpdateProfile() {
       console.log(validateData())
 
       setShow(true)
-      setTimeout(() => {setShow(false)},5000)
+      setTimeout(() => { setShow(false) }, 5000)
     }
+  }
+
+  //! THIS IS ONLY TEMPORARY!
+  function handleLogout() {
+    logout()
   }
 
   function alert() {
@@ -93,7 +98,7 @@ export default function UpdateProfile() {
         <Row>
           <Col sm className='pt-2' ref={userNameColRef}>
             <FloatingLabel controlId='floatingName' label='Your Name' >
-              <Form.Control type='text' ref={userNameRef} placeholder='Your Name'/>
+              <Form.Control type='text' ref={userNameRef} placeholder='Your Name' />
             </FloatingLabel>
           </Col>
           <Col sm className='pt-2' ref={flyingSinceColRef}>
@@ -114,6 +119,13 @@ export default function UpdateProfile() {
           <Col sm className='text-center pt-3'>
             <Button type='submit' variant='primary' size='lg' onClick={handleUpdateProfile}>
               Update Profile
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col sm className='text-center pt-3'>
+            <Button variant='danger' size='lg' onClick={handleLogout}>
+              Logout
             </Button>
           </Col>
         </Row>

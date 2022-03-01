@@ -1,7 +1,7 @@
 import React, { useRef, useState, useContext } from 'react'
-import { ProfileDataContext } from '../contexts/ProfileDataContext'
+import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { Button, Form, Container, Col, Row, Card, FloatingLabel, Alert } from 'react-bootstrap'
-import '../css/bitacora.css'
+
 
 export default function GliderList() {
 
@@ -18,8 +18,8 @@ export default function GliderList() {
       && manufacturerInputRef.current.value.length > 0
       && modelInputRef.current.value.length > 0
     )
-    setShow(!verifyGlider) 
-    setTimeout(() => {setShow(false)}, 5000)
+    setShow(!verifyGlider)
+    setTimeout(() => { setShow(false) }, 5000)
     if (verifyGlider) {
       const isDefault = (gliderList.length === 0)
       const newGlider = {
@@ -109,28 +109,28 @@ export default function GliderList() {
   }
 
   return (
-      <Card>
-        <Card.Title className='text-center'>Glider</Card.Title>
-        <Card.Body>
-          {alert()}
-          {showGliderList()}
-          <Form.Select ref={typeSelectRef}>
-            <option value='XX'>Select your glider type</option>
-            <option value='Hangglider'>Hangglider</option>
-            <option value='Paraglider'>Paraglider</option>
-          </Form.Select>
-          <FloatingLabel controlId='manufacturer' label='Manufacturer' className='pt-2'>
-            <Form.Control type='text' ref={manufacturerInputRef} placeholder='Manufacturer' />
-          </FloatingLabel>
-          <FloatingLabel controlId='model' label='Model' className='pt-2'>
-            <Form.Control type='text' ref={modelInputRef} placeholder='Model' />
-          </FloatingLabel>
-          <div className='pt-2 text-center'>
-            <Button variant='primary' onClick={handleAddGlider}>
-              Add Glider
-            </Button>
-          </div>
-        </Card.Body>
-      </Card>
+    <Card>
+      <Card.Title className='text-center'>Glider</Card.Title>
+      <Card.Body>
+        {alert()}
+        {showGliderList()}
+        <Form.Select ref={typeSelectRef}>
+          <option value='XX'>Select your glider type</option>
+          <option value='Hangglider'>Hangglider</option>
+          <option value='Paraglider'>Paraglider</option>
+        </Form.Select>
+        <FloatingLabel controlId='manufacturer' label='Manufacturer' className='pt-2'>
+          <Form.Control type='text' ref={manufacturerInputRef} placeholder='Manufacturer' />
+        </FloatingLabel>
+        <FloatingLabel controlId='model' label='Model' className='pt-2'>
+          <Form.Control type='text' ref={modelInputRef} placeholder='Model' />
+        </FloatingLabel>
+        <div className='pt-2 text-center'>
+          <Button variant='primary' onClick={handleAddGlider}>
+            Add Glider
+          </Button>
+        </div>
+      </Card.Body>
+    </Card>
   )
 }
