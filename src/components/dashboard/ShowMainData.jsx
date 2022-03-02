@@ -1,63 +1,64 @@
-import { render } from '@testing-library/react'
-import React from 'react'
-import { Badge, Card, ListGroup } from 'react-bootstrap'
+import React, { useContext, useState } from 'react'
+import { ProfileDataContext } from '../../contexts/ProfileDataContext'
+import { Badge, Card } from 'react-bootstrap'
 import EditMainData from './EditMainData'
-import { AuthProvider } from '../../contexts/AuthContext';
-import { ProfileDataProvider } from '../../contexts/ProfileDataContext'
+import ShowLicenses from './ShowLicenses'
 
-export default function ShowMainData({ profileData }) {
+export default function ShowMainData({ props }) {
 
-  function licenseList() {
-    const retVal = profileData?.licenses?.map((license, idx) => {
-      return <ListGroup.Item key={`lic-${idx}`}>{license.id}</ListGroup.Item>
-    })
+  const { getMainOrLicenceData, updateMainOrLicenceData } = useContext(ProfileDataContext)
+  const [dataReady, setDataReady] = useState(false)
+  const [mainData, setMainData] = useState(null)
+  const [openDlg, setOpenDlg] = useState(null)
 
-    return retVal
-  }
-
-  function handlecloseDlg() {
-    console.log('Wau Wau')
-  }
-
-  function handleChangeMainData(e) {
-    const props = {
-      data: profileData?.mainData,
-      closeDlg: handlecloseDlg
+  async function getDataFromDb() {
+    if (!dataReady) {
+      setDataReady(true)
+      const data = await getMainOrLicenceData('/profile/mainData')
+      setMainData(data)
     }
-    render(
-      <AuthProvider>
-        <ProfileDataProvider>
-          <EditMainData props={props} />
-        </ProfileDataProvider>
-      </AuthProvider>
-    )
   }
 
+  if (!dataReady) {
+    getDataFromDb()
+  }
 
-  function handleChangeLicenses(e) {
-    console.log('Na so was...')
+  function handleOpenDlg() {
+    console.log('Rendering dialog')
+    const props = {
+      data: mainData,
+      onClose: onClose
+    }
+    setOpenDlg(<EditMainData props={props} />)
+  }
+
+  function onClose(dialogData) {
+    console.log(dialogData)
+    if (dialogData) {
+      updateMainOrLicenceData('/profile/mainData', dialogData, () => {
+        setDataReady(false)
+      })
+    }
+    setOpenDlg(null)
   }
 
   return (
-    <Card className='profile-container text-center'>
-      <Card.Header><h1>{profileData?.mainData?.pilotName}</h1></Card.Header>
-      <Card.Subtitle className='pt-2'>
-        <h2>Flying since: {profileData?.mainData?.flyingSince}</h2>
-        <Badge pill bg="primary" onClick={handleChangeMainData}>
-          Change this
-        </Badge>
-      </Card.Subtitle>
-      <Card.Body className='text-center licenses-container'>
-        <Card className='licenses-card'>
-          <Card.Header>Licenses</Card.Header>
-          <ListGroup variant="flush" >
-            {licenseList()}
-          </ListGroup>
-        </Card>
-        <Badge pill bg="primary" onClick={handleChangeLicenses}>
-          Change this
-        </Badge>
-      </Card.Body>
-    </Card>
+    <>
+      <Card className='profile-container text-center'>
+        <Card.Header><h1>{mainData?.pilotName}</h1></Card.Header>
+        <Card.Subtitle className='pt-2'>
+          <h2>Flying since: {mainData?.flyingSince}</h2>
+          <Badge pill bg="primary" onClick={handleOpenDlg}>
+            Change this
+          </Badge>
+        </Card.Subtitle>
+        <Card.Body className='text-center licenses-container'>
+          <ShowLicenses />
+        </Card.Body>
+      </Card>
+      <div id='mainDataPopup'>
+        {openDlg}
+      </div>
+    </>
   )
 }

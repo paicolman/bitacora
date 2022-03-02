@@ -1,32 +1,33 @@
-import React, { useState, useRef, useEffect, useContext } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Button, Modal, FloatingLabel, Form } from 'react-bootstrap'
-import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 
 export default function EditMainData({ props }) {
 
-  const { updateMainData } = useContext(ProfileDataContext)
   const [show, setShow] = useState(true);
   const userNameRef = useRef()
   const flyingSinceRef = useRef()
-  const handleClose = () => setShow(false);
+
 
   useEffect(() => {
-    console.log(props)
-    userNameRef.current.value = props.data.pilotName
-    flyingSinceRef.current.value = props.data.flyingSince
-  })
+    userNameRef.current.value = props?.data?.pilotName
+    flyingSinceRef.current.value = props?.data?.flyingSince
+
+  }, [])
 
   function handleOk() {
-    const mainData = {
-      pilotName: userNameRef.current.value,
-      flyingSince: flyingSinceRef.current.value
+    const dialogData = {
+      flyingSince: flyingSinceRef.current.value,
+      pilotName: userNameRef.current.value
     }
-    updateMainData(mainData, () => {
-      setShow(false)
-      props.closeDlg()
-    })
-
+    //updateMainData(mainData)
+    setShow(false)
+    props.onClose(dialogData)
   }
+
+  function handleClose() {
+    setShow(false)
+    props.onClose()
+  };
 
   return (
     <>

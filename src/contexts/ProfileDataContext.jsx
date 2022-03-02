@@ -21,22 +21,35 @@ export function ProfileDataProvider({ children }) {
     pilotIsRegistered: pilotIsRegistered,
     getProfileData: getProfileData,
 
-    updateMainData: updateMainData
+    updateMainOrLicenceData: updateMainOrLicenceData,
+    getMainOrLicenceData: getMainOrLicenceData
   }
 
   let licensesList = []
   let glidersList = []
 
-  function updateMainData(mainData, callback) {
+  function updateMainOrLicenceData(path, dataToWrite, callback) {
     const db = getDatabase(app)
-    const pilotRef = ref(db, `${currentUser.uid}/profile/mainData`)
-    onValue(pilotRef, (snapshot) => {
-      set(pilotRef, {
-        pilotName: mainData.pilotName,
-        flyingSince: mainData.flyingSince
-      })
+    const pilotRef = ref(db, `${currentUser.uid}${path}`)
+    const unsuscribe = onValue(pilotRef, (snapshot) => {
+      set(pilotRef, dataToWrite)
       callback()
+    }, (err) => { console.log(err) }, false)
+    unsuscribe.apply() // To prevent repeated writing on changes
+  }
+
+  //! use /profile/mainData or /profile/licenses
+  function getMainOrLicenceData(path) {
+    console.log('Getting main or licence data...')
+    const db = getDatabase(app)
+    const pilotRef = ref(db, `${currentUser.uid}${path}`)
+    const mainDataReady = new Promise((resolve) => {
+      const unsuscribe = onValue(pilotRef, (snapshot) => {
+        resolve(snapshot.val())
+      })
+      unsuscribe.apply()
     })
+    return mainDataReady
   }
 
   function updateLicenses(licenses) {
@@ -92,7 +105,6 @@ export function ProfileDataProvider({ children }) {
   }
 
   function getProfileData() {
-    console.log('getting profile data...')
     const db = getDatabase(app)
     const pilotRef = ref(db, `${currentUser.uid}/profile`)
     const pilotDataReady = new Promise((resolve, reject) => {

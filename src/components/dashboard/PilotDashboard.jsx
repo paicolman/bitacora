@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react'
-import { ProfileDataContext } from '../../contexts/ProfileDataContext'
+import { AuthProvider } from '../../contexts/AuthContext';
+import { ProfileDataContext, ProfileDataProvider } from '../../contexts/ProfileDataContext'
 import { Col, Row, Card } from 'react-bootstrap'
 import ShowMainData from './ShowMainData'
 
@@ -8,15 +9,18 @@ export default function PilotDashboard() {
   const [profileData, setProfileData] = useState(null)
   const { getProfileData } = useContext(ProfileDataContext)
 
-  const userDataReady = async () => {
+  async function getProfileDataFromDb() {
     if (!dataReady) {
+      setDataReady(true)
       const data = await getProfileData()
       setProfileData(data)
-      setDataReady(true)
     }
   }
+
+  console.log(profileData)
+
   if (!dataReady) {
-    userDataReady()
+    getProfileDataFromDb()
   }
 
   function glidersList() {
@@ -44,7 +48,11 @@ export default function PilotDashboard() {
   return (
     <>
       <div className='profile-container'>
-        <ShowMainData profileData={profileData} />
+        <AuthProvider>
+          <ProfileDataProvider>
+            <ShowMainData />
+          </ProfileDataProvider>
+        </AuthProvider>
         <Row>
           <Col sm>
             <Card className='text-center'>
