@@ -53,12 +53,12 @@ export default function ShowGliders() {
   }
 
   function onClose(dialogData) {
-    // console.log(dialogData)
-    // if (dialogData) {
-    //   updateMainOrLicenceData('/profile/gliders', dialogData.licenses, () => {
-    //     setDataReady(false)
-    //   })
-    // }
+    console.log(dialogData)
+    if (dialogData) {
+      updateMainOrLicenceData('/profile/gliders', dialogData.gliders, () => {
+        setDataReady(false)
+      })
+    }
     setOpenDlg(null)
   }
 
