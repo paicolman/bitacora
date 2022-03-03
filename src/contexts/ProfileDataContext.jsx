@@ -38,9 +38,8 @@ export function ProfileDataProvider({ children }) {
     unsuscribe.apply() // To prevent repeated writing on changes
   }
 
-  //! use /profile/mainData or /profile/licenses
+  //! Rename to getProfileData or somethin'
   function getMainOrLicenceData(path) {
-    console.log('Getting main or licence data...')
     const db = getDatabase(app)
     const pilotRef = ref(db, `${currentUser.uid}${path}`)
     const mainDataReady = new Promise((resolve) => {

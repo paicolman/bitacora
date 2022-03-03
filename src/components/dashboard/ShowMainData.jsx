@@ -4,18 +4,25 @@ import { Badge, Card } from 'react-bootstrap'
 import EditMainData from './EditMainData'
 import ShowLicenses from './ShowLicenses'
 
-export default function ShowMainData({ props }) {
+export default function ShowMainData({ newPilot }) {
 
   const { getMainOrLicenceData, updateMainOrLicenceData } = useContext(ProfileDataContext)
+  const [newUser, setNewUser] = useState(newPilot)
   const [dataReady, setDataReady] = useState(false)
   const [mainData, setMainData] = useState(null)
   const [openDlg, setOpenDlg] = useState(null)
 
+  if (newUser) {
+    setNewUser(false)
+    handleOpenDlg()
+  }
+
+
   async function getDataFromDb() {
     if (!dataReady) {
-      setDataReady(true)
       const data = await getMainOrLicenceData('/profile/mainData')
       setMainData(data)
+      setDataReady(true)
     }
   }
 
@@ -33,9 +40,16 @@ export default function ShowMainData({ props }) {
   }
 
   function onClose(dialogData) {
-    console.log(dialogData)
-    if (dialogData) {
-      updateMainOrLicenceData('/profile/mainData', dialogData, () => {
+    let dlgData = dialogData
+    if (mainData === null) {
+      dlgData = {
+        flyingSince: 'who knows?',
+        pilotName: 'The Unnamed Pilot'
+      }
+    }
+    if (dlgData) {
+      console.log(dialogData)
+      updateMainOrLicenceData('/profile/mainData', dlgData, () => {
         setDataReady(false)
       })
     }

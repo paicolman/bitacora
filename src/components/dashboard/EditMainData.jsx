@@ -9,7 +9,7 @@ export default function EditMainData({ props }) {
 
 
   useEffect(() => {
-    userNameRef.current.value = props?.data?.pilotName
+    userNameRef.current.value = props?.data?.pilotName === undefined ? null : props?.data?.pilotName
     flyingSinceRef.current.value = props?.data?.flyingSince
 
   }, [])
@@ -38,7 +38,7 @@ export default function EditMainData({ props }) {
         keyboard={false}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Change Main Data</Modal.Title>
+          <Modal.Title>Please enter your data</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <FloatingLabel controlId='floatingName' label='Your Name' >

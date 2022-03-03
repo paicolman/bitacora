@@ -10,24 +10,26 @@ import '../css/bitacora.css'
 
 function App() {
   return (
-    <Navigate>
-      <AuthProvider>
-        <Routes>
-          <Route exact path="/" element={
-            <>
-              <ProfileDataProvider>
-                <LoginLanding />
-              </ProfileDataProvider>
-            </>
-          }
-          />
+    <>
 
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-        </Routes>
-      </AuthProvider>
-    </Navigate>
+      <Navigate>
+        <AuthProvider>
+          <Routes>
+            <Route exact path="/" element={
+              <>
+                <ProfileDataProvider>
+                  <LoginLanding />
+                </ProfileDataProvider>
+              </>
+            }
+            />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+          </Routes>
+        </AuthProvider>
+      </Navigate>
+    </>
   );
 }
 

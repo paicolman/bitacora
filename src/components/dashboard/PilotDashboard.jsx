@@ -3,8 +3,10 @@ import { AuthProvider } from '../../contexts/AuthContext';
 import { ProfileDataContext, ProfileDataProvider } from '../../contexts/ProfileDataContext'
 import { Col, Row, Card } from 'react-bootstrap'
 import ShowMainData from './ShowMainData'
+import ShowGliders from './ShowGliders'
+import AppHeader from '../AppHeader'
 
-export default function PilotDashboard() {
+export default function PilotDashboard({ newPilot }) {
   const [dataReady, setDataReady] = useState(false)
   const [profileData, setProfileData] = useState(null)
   const { getProfileData } = useContext(ProfileDataContext)
@@ -23,34 +25,13 @@ export default function PilotDashboard() {
     getProfileDataFromDb()
   }
 
-  function glidersList() {
-    let retVal = <Col sm>please wait...</Col>
-    if (dataReady) {
-      retVal = profileData?.gliders?.map((glider, idx) => {
-        return (
-          <Row key={`gliders-${idx}`}>
-            <Col sm className='text-center rounded-box pt-3 m-3'>
-              <Row><Col sm><h4>{glider.type}</h4></Col></Row>
-              <Row><Col sm><h5>{glider.manufacturer}</h5></Col></Row>
-              <Row><Col sm><h5>{glider.model}</h5></Col></Row>
-            </Col>
-            <Col sm>
-              <img alt='Pic of a HG' className='img-fluid rounded shadow-2-strong pt-2' src='https://upload.wikimedia.org/wikipedia/commons/d/d1/Hang_gliding_hyner.jpg' />
-            </Col>
-          </Row>
-        )
-      })
-    }
-    return retVal
-  }
-
-
   return (
     <>
+      <AppHeader logoutUser={true} />
       <div className='profile-container'>
         <AuthProvider>
           <ProfileDataProvider>
-            <ShowMainData />
+            <ShowMainData newPilot={newPilot} />
           </ProfileDataProvider>
         </AuthProvider>
         <Row>
@@ -63,13 +44,9 @@ export default function PilotDashboard() {
             </Card>
           </Col>
           <Col sm>
-            <Card className='text-center'>
-              <Card.Header><h3>Your Gliders</h3></Card.Header>
-              <Card.Title>Here are your flying machines!</Card.Title>
-              <Card.Body>
-                {glidersList()}
-              </Card.Body>
-            </Card>
+            <ProfileDataProvider>
+              <ShowGliders />
+            </ProfileDataProvider>
           </Col>
         </Row>
       </div>

@@ -12,9 +12,9 @@ export default function ShowLicenses() {
 
   async function getDataFromDb() {
     if (!dataReady) {
-      setDataReady(true)
       const data = await getMainOrLicenceData('/profile/licenses')
       setLicenses(data)
+      setDataReady(true)
     }
   }
 
@@ -23,10 +23,9 @@ export default function ShowLicenses() {
     console.log(licenses)
   }
 
-
   function licenseList() {
     if (licenses === null) {
-      return <p>Could not find any</p>
+      return <p>No licenses</p>
     } else {
       const retVal = licenses.map((license, idx) => {
         return <ListGroup.Item key={`lic-${idx}`}>{license.id}</ListGroup.Item>
@@ -37,7 +36,6 @@ export default function ShowLicenses() {
   }
 
   function handleOpenDlg() {
-    console.log('Rendering dialog')
     const props = {
       licenses: licenses,
       onClose: onClose

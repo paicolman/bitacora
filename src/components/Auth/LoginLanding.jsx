@@ -24,10 +24,10 @@ export default function LoginLanding() {
         retval = <Navigate to="/login" />
         break
       case 'unregistered':
-        retval = <UpdateProfile />
+        retval = <PilotDashboard newPilot={true} />
         break
       case 'registered':
-        retval = <PilotDashboard />
+        retval = <PilotDashboard newPilot={false} />
         break
       default:
         break

@@ -46,3 +46,7 @@ div#root{
   border: 0.5px solid #6c757d;
   background-color: #f8f9fa;
 }
+.app-header{
+  height: 100px; 
+  background-color: #a7bbec;
+}

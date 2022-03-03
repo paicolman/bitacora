@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import { Button, Card, Col, InputGroup, Modal, FloatingLabel, Form, Row } from 'react-bootstrap'
 
 export default function EditLicenses({ props }) {
