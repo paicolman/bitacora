@@ -91,49 +91,47 @@ export default function EditLicenses({ props }) {
   }
 
   return (
-    <>
-      <Modal
-        show={show}
-        onHide={handleClose}
-        backdrop="static"
-        keyboard={false}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Licenses</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Card>
-            <Card.Title className='text-center'>Available Licenses</Card.Title>
-            <Card.Body>
-              <Row>
-                <InputGroup className="mb-3">
-                  <Col>
-                    {displayLicenses()}
-                  </Col>
-                </InputGroup>
-              </Row>
-              <Row className='pt-2'>
-                <Col sm={8}>
-                  <FloatingLabel controlId='floatingAddLicence' label='Add License' >
-                    <Form.Control ref={licensesInputRef} type='text' />
-                  </FloatingLabel>
+    <Modal
+      show={show}
+      onHide={handleClose}
+      backdrop="static"
+      keyboard={false}
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>Edit Licenses</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Card>
+          <Card.Title className='text-center'>Available Licenses</Card.Title>
+          <Card.Body>
+            <Row>
+              <InputGroup className="mb-3">
+                <Col>
+                  {displayLicenses()}
                 </Col>
-                <Col sm className='text-end pt-2'>
-                  <Button variant='primary' onClick={handleAddLicence}>
-                    Add
-                  </Button>
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleOk}>OK</Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+              </InputGroup>
+            </Row>
+            <Row className='pt-2'>
+              <Col sm={8}>
+                <FloatingLabel controlId='floatingAddLicence' label='Add License' >
+                  <Form.Control ref={licensesInputRef} type='text' />
+                </FloatingLabel>
+              </Col>
+              <Col sm className='text-end pt-2'>
+                <Button variant='primary' onClick={handleAddLicence}>
+                  Add
+                </Button>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={handleOk}>OK</Button>
+      </Modal.Footer>
+    </Modal>
   )
 }

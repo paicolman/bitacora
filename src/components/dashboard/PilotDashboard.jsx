@@ -1,3 +1,15 @@
+
+//*****************************************************************************************
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//! THIS FILE IS NOT USED ANYMORE. LEFT HERE FOR REFERENCE AT THE MOMENT, WILL DELETE LATER
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//*****************************************************************************************
+
+
+
+
+
+
 import React, { useContext, useState } from 'react'
 import { AuthProvider } from '../../contexts/AuthContext';
 import { ProfileDataContext, ProfileDataProvider } from '../../contexts/ProfileDataContext'
@@ -5,6 +17,7 @@ import { Col, Row, Card } from 'react-bootstrap'
 import ShowMainData from './ShowMainData'
 import ShowGliders from './ShowGliders'
 import AppHeader from '../AppHeader'
+import FlightContainer from '../FlightContainer';
 
 export default function PilotDashboard({ newPilot }) {
   const [dataReady, setDataReady] = useState(false)

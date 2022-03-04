@@ -5,6 +5,7 @@ export default function EditGliders({ props }) {
   const [show, setShow] = useState(true);
   const [showAlert, setAlert] = useState(false);
   const [gliders, setGliders] = useState(props.gliders)
+  const [image, setImage] = useState(null)
 
   const typeSelectRef = useRef()
   const manufacturerRef = useRef()
@@ -144,7 +145,7 @@ export default function EditGliders({ props }) {
                 <Card style={{ maxWidth: '400px' }}>
                   <Card.Body className='py-0'>
                     <Form.Text muted>
-                      Image:
+                      Image: (put explanation on how to upload here...)
                     </Form.Text>
                     <p>{glider.imgLink}</p>
                   </Card.Body>
@@ -298,14 +299,6 @@ export default function EditGliders({ props }) {
                       </Col>
                       <Col sm={10}>
                         <Form.Control size='sm' type='number' ref={numFlightsRef} />
-                      </Col>
-                    </Form.Group>
-                    <Form.Group as={Row} className='pt-1'>
-                      <Col sm={2}>
-                        <Form.Label className='small'>Image:</Form.Label>
-                      </Col>
-                      <Col sm={10}>
-                        <Form.Control size='sm' type='file' />
                       </Col>
                     </Form.Group>
                     <Form.Group as={Row} className='pt-1'>
