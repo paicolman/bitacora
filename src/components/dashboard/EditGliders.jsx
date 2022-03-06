@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react'
+import uuid from 'react-uuid'
 import { Accordion, Alert, Button, Card, Col, Container, InputGroup, Modal, Form, Row, CardGroup } from 'react-bootstrap'
 
 export default function EditGliders({ props }) {
   const [show, setShow] = useState(true);
   const [showAlert, setAlert] = useState(false);
   const [gliders, setGliders] = useState(props.gliders)
-  const [image, setImage] = useState(null)
 
   const typeSelectRef = useRef()
   const manufacturerRef = useRef()
@@ -29,8 +29,9 @@ export default function EditGliders({ props }) {
       setTimeout(() => { setAlert(false) }, 5000)
     }
     if (verifyGlider) {
-      const isDefault = (gliders.length === 0)
+      const isDefault = gliders ? gliders.length === 0 : 0
       const newGlider = {
+        id: uuid(),
         default: isDefault,
         lastCheck: lastCheckRef.current.value,
         manufacturer: manufacturerRef.current.value,
@@ -42,7 +43,13 @@ export default function EditGliders({ props }) {
       }
       const addWing = addWingRef.current.innerHTML === 'Add Wing'
       if (addWing) {
-        setGliders(prevState => ([...prevState, newGlider]))
+        if (gliders) {
+          setGliders(prevState => ([...prevState, newGlider]))
+        } else {
+          //First glider, so just set it...
+          setGliders([newGlider])
+        }
+
       } else {
         const editedGliders = [...gliders]
         editedGliders[editIndex] = newGlider
@@ -105,7 +112,7 @@ export default function EditGliders({ props }) {
   function displayGliders() {
     let retval = <></>
     console.log(gliders)
-    if (gliders != null) {
+    if (gliders) {
       retval = gliders.map((glider, index) => {
 
         const gliderName = glider.nickname ? `${glider.nickname} (${glider.type})` : `${glider.model} (${glider.type})`

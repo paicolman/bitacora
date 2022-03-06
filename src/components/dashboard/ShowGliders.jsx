@@ -2,9 +2,11 @@ import React, { useState, useContext, useCallback } from 'react'
 import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { useDropzone } from 'react-dropzone'
 import { Badge, Card, Col, Row } from 'react-bootstrap'
+import Image from 'react-bootstrap/Image'
 import EditGliders from './EditGliders'
 import ShowGliderDetails from './ShowGliderDetails'
-import { getStorage, ref, uploadBytes } from 'firebase/storage'
+import DropzoneGlider from '../DropzoneGlider'
+
 
 export default function ShowGliders() {
   const { getMainOrLicenceData, updateMainOrLicenceData } = useContext(ProfileDataContext)
@@ -14,15 +16,8 @@ export default function ShowGliders() {
   const [openDetailsDlg, setOpenDetailsDlg] = useState(null)
 
 
-  const onDrop = useCallback(acceptedFiles => {
-    const storage = getStorage()
-    const storageRef = ref(storage, 'images')
-    uploadBytes(storageRef, acceptedFiles[0]).then((snapshot) => {
-      console.log('Uploaded a blob or file!');
-    })
-  }, [])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+
 
   async function getDataFromDb() {
     if (!dataReady) {
@@ -57,10 +52,10 @@ export default function ShowGliders() {
 
   function glidersList() {
     let retVal = <Col sm>please wait...</Col>
-    if (dataReady) {
+    if (dataReady && gliders) {
       retVal = gliders.map((glider, idx) => {
         return (
-          <Row key={`gliders-${idx}`}>
+          <Row key={`gliders-${idx}`} style={{ maxHeight: '130px' }}>
             <Col id={`gliders-${idx}`} sm className='text-center rounded-box pt-3 m-1 glider-list' onClick={handleShowDetails}>
               <Row className='justify-content-center'><h5 id={`type-${idx}`}>{glider.type}</h5></Row>
               <Row><b id={`manu-${idx}`}>{glider.manufacturer}</b></Row>
@@ -68,14 +63,7 @@ export default function ShowGliders() {
               <Row><b id={`nick-${idx}`}>{glider.nickname}</b></Row>
             </Col>
             <Col sm className='w-50'>
-              <div {...getRootProps()}>
-                <input {...getInputProps()} />
-                {
-                  isDragActive ?
-                    <p>Drop the files here ...</p> :
-                    <p>Drag 'n' drop some files here, or click to select files</p>
-                }
-              </div>
+              <DropzoneGlider gliderId={glider.id} />
             </Col>
           </Row>
         )
