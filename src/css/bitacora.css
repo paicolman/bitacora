@@ -53,3 +53,7 @@ div#root {
 .glider-list {
   width: 40% !important;
 }
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}

@@ -1,8 +1,6 @@
-import React, { useState, useContext, useCallback } from 'react'
+import React, { useState, useContext } from 'react'
 import { ProfileDataContext } from '../../contexts/ProfileDataContext'
-import { useDropzone } from 'react-dropzone'
 import { Badge, Card, Col, Row } from 'react-bootstrap'
-import Image from 'react-bootstrap/Image'
 import EditGliders from './EditGliders'
 import ShowGliderDetails from './ShowGliderDetails'
 import DropzoneGlider from '../DropzoneGlider'
@@ -55,15 +53,15 @@ export default function ShowGliders() {
     if (dataReady && gliders) {
       retVal = gliders.map((glider, idx) => {
         return (
-          <Row key={`gliders-${idx}`} style={{ maxHeight: '130px' }}>
+          <Row key={`gliders-${idx}`} style={{ maxHeight: '200px' }}>
             <Col id={`gliders-${idx}`} sm className='text-center rounded-box pt-3 m-1 glider-list' onClick={handleShowDetails}>
               <Row className='justify-content-center'><h5 id={`type-${idx}`}>{glider.type}</h5></Row>
               <Row><b id={`manu-${idx}`}>{glider.manufacturer}</b></Row>
               <Row><b id={`modl-${idx}`}>{glider.model}</b></Row>
               <Row><b id={`nick-${idx}`}>{glider.nickname}</b></Row>
             </Col>
-            <Col sm className='w-50'>
-              <DropzoneGlider gliderId={glider.id} />
+            <Col sm className='w-50' style={{ alignSelf: 'center' }}>
+              <DropzoneGlider gliderId={glider.id} style={{ maxHeight: '200px' }} />
             </Col>
           </Row>
         )

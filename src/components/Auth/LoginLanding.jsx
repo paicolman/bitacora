@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import UpdateProfile from '../dashboard/UpdateProfile'
 import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import PilotDashboard from '../dashboard/PilotDashboard'
 

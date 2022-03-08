@@ -7,6 +7,7 @@ import Login from './Auth/Login';
 import ForgotPassword from './Auth/ForgotPassword';
 import { ProfileDataProvider } from '../contexts/ProfileDataContext';
 import '../css/bitacora.css'
+import FlightContainer from './FlightContainer';
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/assets" element={<div></div>} />
+            <Route exact path="/flights" element={<FlightContainer />} />
           </Routes>
         </AuthProvider>
       </Navigate>
