@@ -1,6 +1,6 @@
 import React, { useContext, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Card } from 'react-bootstrap'
+import { Card, Image } from 'react-bootstrap'
 import { FlightContext } from '../contexts/FlightContext'
 
 
@@ -13,8 +13,7 @@ export default function DropzoneFlight() {
   }, [])
   const {
     getRootProps,
-    getInputProps,
-    isDragActive
+    getInputProps
   } = useDropzone({
     onDrop,
     maxFiles: 1
@@ -22,14 +21,12 @@ export default function DropzoneFlight() {
 
   return (
     <Card>
-      <Card.Title>Drop your IGC File here...</Card.Title>
-      <Card.Body>
+      <Card.Title className='text-center'>Drop your IGC File here</Card.Title>
+      <Card.Body className='text-center'>
         <div {...getRootProps()}>
           <input {...getInputProps()} />
           {
-            isDragActive ?
-              <p>Drop the files here ...</p> :
-              <p>Drag 'n' drop some files here, or click to select files</p>
+            <Image src='assets/igc_nofile.png' />
           }
         </div>
       </Card.Body>

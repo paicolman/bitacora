@@ -4,7 +4,7 @@ import { Badge, Card, ListGroup } from 'react-bootstrap'
 import EditLicenses from './EditLicenses'
 
 export default function ShowLicenses() {
-  const { getMainOrLicenceData, updateMainOrLicenceData } = useContext(ProfileDataContext)
+  const { getProfileData, updateProfileData } = useContext(ProfileDataContext)
   const [dataReady, setDataReady] = useState(false)
   const [licenses, setLicenses] = useState(null)
   const [openDlg, setOpenDlg] = useState(null)
@@ -12,7 +12,7 @@ export default function ShowLicenses() {
 
   async function getDataFromDb() {
     if (!dataReady) {
-      const data = await getMainOrLicenceData('/profile/licenses')
+      const data = await getProfileData('/profile/licenses')
       setLicenses(data)
       setDataReady(true)
     }
@@ -46,7 +46,7 @@ export default function ShowLicenses() {
   function onClose(dialogData) {
     console.log(dialogData)
     if (dialogData) {
-      updateMainOrLicenceData('/profile/licenses', dialogData.licenses, () => {
+      updateProfileData('/profile/licenses', dialogData.licenses, () => {
         setDataReady(false)
       })
     }

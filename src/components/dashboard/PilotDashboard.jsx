@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { AuthProvider } from '../../contexts/AuthContext';
 import { ProfileDataContext, ProfileDataProvider } from '../../contexts/ProfileDataContext'
-import { Col, Row, Card } from 'react-bootstrap'
+import { Container, Col, Row, Card } from 'react-bootstrap'
 import ShowMainData from './ShowMainData'
 import ShowGliders from './ShowGliders'
 import AppHeader from '../AppHeader'
@@ -26,7 +26,7 @@ export default function PilotDashboard({ newPilot }) {
   }
 
   return (
-    <>
+    <Container>
       <AppHeader logoutUser={true} />
       <div className='profile-container'>
         <AuthProvider>
@@ -50,6 +50,6 @@ export default function PilotDashboard({ newPilot }) {
           </Col>
         </Row>
       </div>
-    </>
+    </Container>
   )
 }

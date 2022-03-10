@@ -6,7 +6,7 @@ import ShowLicenses from './ShowLicenses'
 
 export default function ShowMainData({ newPilot }) {
 
-  const { getMainOrLicenceData, updateMainOrLicenceData } = useContext(ProfileDataContext)
+  const { getProfileData, updateProfileData } = useContext(ProfileDataContext)
   const [newUser, setNewUser] = useState(newPilot)
   const [dataReady, setDataReady] = useState(false)
   const [mainData, setMainData] = useState(null)
@@ -20,7 +20,7 @@ export default function ShowMainData({ newPilot }) {
 
   async function getDataFromDb() {
     if (!dataReady) {
-      const data = await getMainOrLicenceData('/profile/mainData')
+      const data = await getProfileData('/profile/mainData')
       setMainData(data)
       setDataReady(true)
     }
@@ -49,7 +49,7 @@ export default function ShowMainData({ newPilot }) {
     }
     if (dlgData) {
       console.log(dialogData)
-      updateMainOrLicenceData('/profile/mainData', dlgData, () => {
+      updateProfileData('/profile/mainData', dlgData, () => {
         setDataReady(false)
       })
     }

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react"
-import { Form, Button, Card, Alert } from "react-bootstrap"
+import { Container, Form, Button, Card, Alert } from "react-bootstrap"
 import { useAuth } from "../../contexts/AuthContext"
 import { Link } from "react-router-dom"
 import AppHeader from '../AppHeader'
@@ -29,7 +29,7 @@ export default function ForgotPassword() {
   }
 
   return (
-    <>
+    <Container>
       <AppHeader />
       <div className="d-flex justify-content-center">
         <div className="pt-3 w-100" style={{ maxWidth: "400px" }}>
@@ -57,6 +57,6 @@ export default function ForgotPassword() {
           </div>
         </div>
       </div>
-    </>
+    </Container>
   )
 }

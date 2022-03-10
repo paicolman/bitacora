@@ -19,16 +19,15 @@ export function ProfileDataProvider({ children }) {
     setFlyingSince: setFlyingSince,
     initPilotLogBook: initPilotLogBook,
     pilotIsRegistered: pilotIsRegistered,
-    getProfileData: getProfileData,
 
-    updateMainOrLicenceData: updateMainOrLicenceData,
-    getMainOrLicenceData: getMainOrLicenceData
+    updateProfileData: updateProfileData,
+    getProfileData: getProfileData
   }
 
   let licensesList = []
   let glidersList = []
 
-  function updateMainOrLicenceData(path, dataToWrite, callback) {
+  function updateProfileData(path, dataToWrite, callback) {
     const db = getDatabase(app)
     const pilotRef = ref(db, `${currentUser.uid}${path}`)
     const unsuscribe = onValue(pilotRef, (snapshot) => {
@@ -39,14 +38,14 @@ export function ProfileDataProvider({ children }) {
   }
 
   //! Rename to getProfileData or somethin'
-  function getMainOrLicenceData(path) {
+  function getProfileData(path) {
     const db = getDatabase(app)
     const pilotRef = ref(db, `${currentUser.uid}${path}`)
-    const mainDataReady = new Promise((resolve) => {
+    const mainDataReady = new Promise((resolve, reject) => {
       const unsuscribe = onValue(pilotRef, (snapshot) => {
         resolve(snapshot.val())
       })
-      unsuscribe.apply()
+      //unsuscribe.apply()
     })
     return mainDataReady
   }
@@ -101,17 +100,6 @@ export function ProfileDataProvider({ children }) {
 
     })
     return checkRegisteredPilot
-  }
-
-  function getProfileData() {
-    const db = getDatabase(app)
-    const pilotRef = ref(db, `${currentUser.uid}/profile`)
-    const pilotDataReady = new Promise((resolve, reject) => {
-      onValue(pilotRef, (snapshot) => {
-        resolve(snapshot.val())
-      })
-    })
-    return pilotDataReady
   }
 
   let preventFlood = false //TODO: Check if this is still needed

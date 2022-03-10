@@ -7,7 +7,7 @@ import DropzoneGlider from '../DropzoneGlider'
 
 
 export default function ShowGliders() {
-  const { getMainOrLicenceData, updateMainOrLicenceData } = useContext(ProfileDataContext)
+  const { getProfileData, updateProfileData } = useContext(ProfileDataContext)
   const [dataReady, setDataReady] = useState(false)
   const [gliders, setgliders] = useState(null)
   const [openDlg, setOpenDlg] = useState(null)
@@ -20,7 +20,7 @@ export default function ShowGliders() {
   async function getDataFromDb() {
     if (!dataReady) {
 
-      const data = await getMainOrLicenceData('/profile/gliders')
+      const data = await getProfileData('/profile/gliders')
       console.log(data)
       setgliders(data)
       setDataReady(true)
@@ -81,7 +81,7 @@ export default function ShowGliders() {
   function onClose(dialogData) {
     console.log(dialogData)
     if (dialogData) {
-      updateMainOrLicenceData('/profile/gliders', dialogData.gliders, () => {
+      updateProfileData('/profile/gliders', dialogData.gliders, () => {
         setDataReady(false)
       })
     }

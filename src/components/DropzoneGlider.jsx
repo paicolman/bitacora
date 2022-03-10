@@ -70,6 +70,7 @@ export default function DropzoneGlider({ gliderId }) {
       })
     }
   }
+
   getPicUrl()
 
 
