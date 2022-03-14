@@ -24,10 +24,9 @@ export default function FlightChart({ chartType }) {
 
 
   return (
-    <div id='map' style={{ width: '1200px', height: '400px', border: '3px solid black' }}>
-      <ResponsiveContainer width='100%' height='100%'>
+    <div id='map' style={{ width: '100%', height: '400px', border: '2px solid black' }}>
+      <ResponsiveContainer width={'100%'} height={'100%'}>
         <AreaChart
-
           data={data}
           margin={{
             top: 10,
@@ -44,7 +43,7 @@ export default function FlightChart({ chartType }) {
           <Area type='monotone' dataKey={chartType} stroke='#8884d8' fill='#8884d8' />
         </AreaChart>
       </ResponsiveContainer>
-    </div>
 
+    </div>
   )
 }

@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
 import IGCParser from 'igc-parser'
 import { resolvePath } from 'react-router-dom'
-import { getRhumbLineBearing, getDistance } from 'geolib'
+import { getRhumbLineBearing, getDistance, getPathLength } from 'geolib'
 
 export const FlightContext = React.createContext()
 
 export default function FlightContextProvider({ children }) {
   const diffData = []
-  const maxSteigen = 0
-  const maxSinken = 0
-  const maxSpeed = 0
+  let maxHeight = 0
+  let maxClimb = 0
+  let maxSink = 0
+  let maxSpeed = 0
+  let maxDistance = 0
+  let pathLength = 0
   let diffDataCalculated = false
 
   const eventBus = {
@@ -27,15 +30,18 @@ export default function FlightContextProvider({ children }) {
   const flightContextValue = {
     eventBus,
     diffDataCalculated,
-    maxSteigen,
-    maxSinken,
-    maxSpeed,
+    getMaxClimb: getMaxClimb,
+    getMaxSink: getMaxSink,
+    getMaxSpeed: getMaxSpeed,
     diffData,
     loadIgcFile: loadIgcFile,
     parseIgcFile: parseIgcFile,
     findStartingPoint: findStartingPoint,
     findLandingPoint: findLandingPoint,
-    getMaxHeight: getMaxHeight
+    getMaxHeight: getMaxHeight,
+    getMaxDistance: getMaxDistance,
+    launchLandingDistance: launchLandingDistance,
+    getPathLen: getPathLen
   }
 
 
@@ -67,7 +73,9 @@ export default function FlightContextProvider({ children }) {
         let igc = IGCParser.parse(text)
         //setIgcObject(igc)
         console.log(igc)
+        getDirectData(igc)
         getDifferentialData(igc)
+        console.log(maxClimb, maxSink, maxSpeed)
         resolve(igc)
       }
       if (igcFile) {
@@ -92,12 +100,19 @@ export default function FlightContextProvider({ children }) {
     })
   }
 
-  function getMaxHeight(igcObject) {
-    let maxAltitude = 0
+  function launchLandingDistance(igcObject) {
+    return getDistance(igcObject.fixes[igcObject.fixes.length - 1], igcObject.fixes[0]) / 1000
+  }
+
+  function getDirectData(igcObject) {
+    let start = igcObject.fixes[0]
+    pathLength = getPathLength(igcObject.fixes) / 1000
+    console.log(pathLength)
     igcObject.fixes.forEach(fix => {
-      maxAltitude = fix.pressureAltitude > maxAltitude ? fix.pressureAltitude : maxAltitude
+      maxHeight = fix.pressureAltitude > maxHeight ? fix.pressureAltitude : maxHeight
+      const distance = getDistance(start, fix) / 1000
+      maxDistance = distance > maxDistance ? distance : maxDistance
     })
-    return maxAltitude
   }
 
   function getDifferentialData(igcObject) {
@@ -117,13 +132,17 @@ export default function FlightContextProvider({ children }) {
         if (idx > 30) {
           prevHspeeds.shift()
         }
-        avgHspeed = (prevHspeeds.reduce((tot, elem) => { return (tot + elem) })) / prevHspeeds.length
+        avgHspeed = ((prevHspeeds.reduce((tot, elem) => { return (tot + elem) })) / prevHspeeds.length) / 3.6
+
+        maxSpeed = maxSpeed > avgHspeed ? maxSpeed : avgHspeed
 
         prevVspeeds.push(vSpeed)
         if (idx > 30) {
           prevVspeeds.shift()
         }
         avgVspeed = (prevVspeeds.reduce((tot, elem) => { return (tot + elem) })) / prevVspeeds.length
+        maxClimb = maxClimb > avgVspeed ? maxClimb : avgVspeed
+        maxSink = maxSink < avgVspeed ? maxSink : avgVspeed
 
 
         diffData.push({
@@ -138,6 +157,13 @@ export default function FlightContextProvider({ children }) {
     })
     diffDataCalculated = true
   }
+
+  function getMaxHeight() { return maxHeight.toFixed(2) }
+  function getMaxSpeed() { return maxSpeed.toFixed(2) }
+  function getMaxClimb() { return maxClimb.toFixed(2) }
+  function getMaxSink() { return maxSink.toFixed(2) }
+  function getMaxDistance() { return maxDistance.toFixed(2) }
+  function getPathLen() { return pathLength }
 
   return (
     <FlightContext.Provider value={flightContextValue}>

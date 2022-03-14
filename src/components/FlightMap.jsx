@@ -28,7 +28,7 @@ export default function FlightMap() {
 
   return (
     <>
-      <div id="map" style={{ width: '1200px', height: '600px', border: '3px solid black' }}>
+      <div id="map" style={{ width: '100%', height: '600px', border: '3px solid black' }}>
         <MapContainer center={position} zoom={13} scrollWheelZoom={false}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

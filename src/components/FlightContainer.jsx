@@ -9,13 +9,49 @@ import PilotInfo from './PilotInfo'
 
 
 export default function FlightContainer() {
-  const { eventBus, findStartingPoint, findLandingPoint, getMaxHeight } = useContext(FlightContext)
+  const {
+    eventBus,
+    findStartingPoint,
+    findLandingPoint,
+    getMaxHeight,
+    getMaxDistance,
+    getMaxSpeed,
+    getMaxClimb,
+    getMaxSink,
+    getPathLen,
+    launchLandingDistance
+  } = useContext(FlightContext)
+
+  const flightDataModel = {
+    launchTime: 0,
+    landingTime: 0,
+    launchHeight: 0,
+    flightType: 0,
+    maxSpeed: 0,
+    minSpeed: 0,
+    maxClimb: 0,
+    maxSink: 0,
+    maxDist: 0,
+    pathLength: 0,
+    launchLandingDist: 0,
+    duration: 'Duration: --:--:--',
+    flightDate: 'Date: ....-..-..',
+    maxHeigth: 'Max Height: ----m'
+  }
+
   const launchTime = useRef()
   const launchHeight = useRef()
   const landingTime = useRef()
-  const [duration, setDuration] = useState('Duration: --:--:--')
-  const [flightDate, setFlightDate] = useState('Date: ....-..-..')
-  const [maxHeigth, setMaxHeigth] = useState('Max Height: ----m')
+  const maxSpeedRef = useRef()
+  const maxClimbRef = useRef()
+  const maxSinkRef = useRef()
+  const maxDistanceRef = useRef()
+  const pathLengthRef = useRef()
+  const startLandingDistRef = useRef()
+  //const [duration, setDuration] = useState('Duration: --:--:--')
+  //const [flightDate, setFlightDate] = useState('Date: ....-..-..')
+  //const [maxHeigth, setMaxHeigth] = useState('Max Height: ----m')
+  const [flightData, setFlightData] = useState(flightDataModel)
 
   useEffect(() => {
     console.log('ON PARSED (FlightCont.)')
@@ -26,9 +62,15 @@ export default function FlightContainer() {
       launchHeight.current.value = launch.pressureAltitude
       const landing = (findLandingPoint(igc))
       landingTime.current.value = landing.time
-      calculateDuration(launch.time, landing.time)
-      setFlightDate(`Date: ${igc.date}`)
-      setMaxHeigth(`Max Height: ${getMaxHeight(igc)} m`)
+      const duration = calculateDuration(launch.time, landing.time)
+      // setFlightDate(`Date: ${igc.date}`)
+      // setMaxHeigth(`Max Height: ${getMaxHeight()} m`)
+      maxSpeedRef.current.value = getMaxSpeed()
+      maxClimbRef.current.value = getMaxClimb()
+      maxSinkRef.current.value = getMaxSink()
+      maxDistanceRef.current.value = getMaxDistance()
+      pathLengthRef.current.value = getPathLen()
+      startLandingDistRef.current.value = launchLandingDistance(igc)
     })
   }, [])
 
@@ -36,8 +78,7 @@ export default function FlightContainer() {
     const launchPartsinSec = startTime.split(':').reduce((acc, time) => (60 * acc) + +time)
     const landPartsInSec = endTime.split(':').reduce((acc, time) => (60 * acc) + +time)
     const durationDate = new Date((landPartsInSec - launchPartsinSec) * 1000).toISOString().slice(11, 19)
-    setDuration(`Duration: ${durationDate}`)
-
+    return (`Duration: ${durationDate}`)
   }
 
   return (
@@ -104,6 +145,11 @@ export default function FlightContainer() {
             </FloatingLabel>
           </Col>
           <Col sm>
+            <FloatingLabel label='Start Height (m):'>
+              <Form.Control id='st-height' type='number' placeholder='Start Height' ref={launchHeight} />
+            </FloatingLabel>
+          </Col>
+          <Col sm>
             <FloatingLabel controlId='flightType' label='Flight type:'>
               <Form.Select id='flightType'>
                 <option value='1'>Top-down flight</option>
@@ -114,23 +160,45 @@ export default function FlightContainer() {
           </Col>
         </Row>
         <Row className='pt-2'>
-          <Col sm>
-            <FloatingLabel label='Start Height:'>
-              <Form.Control id='st-height' type='number' placeholder='Start Height' ref={launchHeight} />
+          <Col>
+            <FloatingLabel label='Max Speed (kmh):'>
+              <Form.Control id='speed' type='text' placeholder='Max. Speed' ref={maxSpeedRef} />
             </FloatingLabel>
           </Col>
           <Col>
-            <FloatingLabel label='Max Speed:'>
-              <Form.Control id='speed' type='text' placeholder='Max. Speed' />
+            <FloatingLabel label='Max Speed (kmh):'>
+              <Form.Control id='speed' type='text' placeholder='Max. Speed' ref={maxSpeedRef} />
             </FloatingLabel>
           </Col>
           <Col>
-            <FloatingLabel label='Wind direction:'>
-              <Form.Control id='wind' type='text' placeholder='Wind' />
+            <FloatingLabel label='Max Climb (m/s):'>
+              <Form.Control id='climb' type='text' placeholder='Max Climb' ref={maxClimbRef} />
+            </FloatingLabel>
+          </Col>
+          <Col>
+            <FloatingLabel label='Max Sink (m/s):'>
+              <Form.Control id='sink' type='text' placeholder='Max Sink' ref={maxSinkRef} />
             </FloatingLabel>
           </Col>
         </Row>
         <Row className='pt-2' >
+          <Col sm>
+            <FloatingLabel label='Max dist. from start (km):'>
+              <Form.Control id='maxDist' type='number' ref={maxDistanceRef} />
+            </FloatingLabel>
+          </Col>
+          <Col sm>
+            <FloatingLabel label='Dist Launch-Landing (km):'>
+              <Form.Control id='path' type='text' placeholder='Dist Launch-Landing' ref={startLandingDistRef} />
+            </FloatingLabel>
+          </Col>
+          <Col sm>
+            <FloatingLabel label='Path Length (km):'>
+              <Form.Control id='path' type='text' placeholder='Path Length' ref={pathLengthRef} />
+            </FloatingLabel>
+          </Col>
+        </Row>
+        <Row className='pt-2'>
           <Col sm>
             <FloatingLabel label='Flight Comments:'>
               <Form.Control as="textarea" rows={6} placeholder='Flight Comments' />
