@@ -9,18 +9,7 @@ import PilotInfo from './PilotInfo'
 
 
 export default function FlightContainer() {
-  const {
-    eventBus,
-    findStartingPoint,
-    findLandingPoint,
-    getMaxHeight,
-    getMaxDistance,
-    getMaxSpeed,
-    getMaxClimb,
-    getMaxSink,
-    getPathLen,
-    launchLandingDistance
-  } = useContext(FlightContext)
+  const { eventBus, flightSpecs } = useContext(FlightContext)
 
   const flightDataModel = {
     launchTime: 0,
@@ -56,29 +45,32 @@ export default function FlightContainer() {
   useEffect(() => {
     console.log('ON PARSED (FlightCont.)')
     eventBus.on('igcParsed', (igc) => {
-      const launch = (findStartingPoint(igc))
+      setFlightData(flightSpecs)
       // const landing = (findLandingPoint(igc))
-      launchTime.current.value = launch.time
-      launchHeight.current.value = launch.pressureAltitude
-      const landing = (findLandingPoint(igc))
-      landingTime.current.value = landing.time
-      const duration = calculateDuration(launch.time, landing.time)
+      launchTime.current.value = flightData?.launch?.time
+      launchHeight.current.value = flightData?.launch?.pressureAltitude
+      landingTime.current.value = flightData?.landing?.time
+      const duration = calculateDuration(flightData?.launch?.time, flightData?.landing?.time)
       // setFlightDate(`Date: ${igc.date}`)
       // setMaxHeigth(`Max Height: ${getMaxHeight()} m`)
-      maxSpeedRef.current.value = getMaxSpeed()
-      maxClimbRef.current.value = getMaxClimb()
-      maxSinkRef.current.value = getMaxSink()
-      maxDistanceRef.current.value = getMaxDistance()
-      pathLengthRef.current.value = getPathLen()
-      startLandingDistRef.current.value = launchLandingDistance(igc)
+      maxSpeedRef.current.value = flightData?.maxSpeed
+      maxClimbRef.current.value = flightData?.maxClimb
+      maxSinkRef.current.value = flightData?.maxSink
+      maxDistanceRef.current.value = flightData?.maxDist
+      pathLengthRef.current.value = flightData?.pathLength
+      startLandingDistRef.current.value = flightData?.launchLandingDist
     })
-  }, [])
+  })
 
   function calculateDuration(startTime, endTime) {
-    const launchPartsinSec = startTime.split(':').reduce((acc, time) => (60 * acc) + +time)
-    const landPartsInSec = endTime.split(':').reduce((acc, time) => (60 * acc) + +time)
-    const durationDate = new Date((landPartsInSec - launchPartsinSec) * 1000).toISOString().slice(11, 19)
-    return (`Duration: ${durationDate}`)
+    if (startTime) {
+      const launchPartsinSec = startTime.split(':').reduce((acc, time) => (60 * acc) + +time)
+      const landPartsInSec = endTime.split(':').reduce((acc, time) => (60 * acc) + +time)
+      const durationDate = new Date((landPartsInSec - launchPartsinSec) * 1000).toISOString().slice(11, 19)
+      return (`Duration: ${durationDate}`)
+    } else {
+      return ('Duration: --:--:--')
+    }
   }
 
   return (
@@ -91,13 +83,13 @@ export default function FlightContainer() {
         </Row>
         <Row className='flight-title'>
           <Col sm>
-            <h2>{flightDate}</h2>
+            <h2>{flightData.flightDate}</h2>
           </Col>
           <Col sm>
-            <h2>{duration}</h2>
+            <h2>{flightData.duration}</h2>
           </Col>
           <Col sm>
-            <h2>{maxHeigth}</h2>
+            <h2>{flightData.maxHeigth}</h2>
           </Col>
         </Row>
         <Row className='p-3'>
