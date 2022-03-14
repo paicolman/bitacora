@@ -45,20 +45,21 @@ export default function FlightContainer() {
   useEffect(() => {
     console.log('ON PARSED (FlightCont.)')
     eventBus.on('igcParsed', (igc) => {
-      setFlightData(flightSpecs)
-      // const landing = (findLandingPoint(igc))
-      launchTime.current.value = flightData?.launch?.time
-      launchHeight.current.value = flightData?.launch?.pressureAltitude
-      landingTime.current.value = flightData?.landing?.time
-      const duration = calculateDuration(flightData?.launch?.time, flightData?.landing?.time)
-      // setFlightDate(`Date: ${igc.date}`)
-      // setMaxHeigth(`Max Height: ${getMaxHeight()} m`)
-      maxSpeedRef.current.value = flightData?.maxSpeed
-      maxClimbRef.current.value = flightData?.maxClimb
-      maxSinkRef.current.value = flightData?.maxSink
-      maxDistanceRef.current.value = flightData?.maxDist
-      pathLengthRef.current.value = flightData?.pathLength
-      startLandingDistRef.current.value = flightData?.launchLandingDist
+      setFlightData(flightSpecs => {
+        // const landing = (findLandingPoint(igc))
+        launchTime.current.value = flightData?.launch?.time
+        launchHeight.current.value = flightData?.launch?.pressureAltitude
+        landingTime.current.value = flightData?.landing?.time
+        const duration = calculateDuration(flightData?.launch?.time, flightData?.landing?.time)
+        // setFlightDate(`Date: ${igc.date}`)
+        // setMaxHeigth(`Max Height: ${getMaxHeight()} m`)
+        maxSpeedRef.current.value = flightData?.maxSpeed
+        maxClimbRef.current.value = flightData?.maxClimb
+        maxSinkRef.current.value = flightData?.maxSink
+        maxDistanceRef.current.value = flightData?.maxDist
+        pathLengthRef.current.value = flightData?.pathLength
+        startLandingDistRef.current.value = flightData?.launchLandingDist
+      })
     })
   })
 
