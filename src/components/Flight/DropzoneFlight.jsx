@@ -1,7 +1,7 @@
 import React, { useContext, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Card, Image } from 'react-bootstrap'
-import { FlightContext } from '../contexts/FlightContext'
+import { FlightContext } from '../../contexts/FlightContext'
 
 
 export default function DropzoneFlight() {

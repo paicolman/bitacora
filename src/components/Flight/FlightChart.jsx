@@ -1,13 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { FlightContext } from '../contexts/FlightContext'
+import { FlightContext } from '../../contexts/FlightContext'
 
 export default function FlightChart({ chartType }) {
   const [data, setData] = useState(null)
   const { eventBus, diffData } = useContext(FlightContext)
 
   useEffect(() => {
-    console.log('ON IGC PARSED')
     eventBus.on('igcParsed', (igc) => {
       if (chartType === 'pressureAltitude') {
         setData(igc.fixes)

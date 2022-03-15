@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Polyline, useMap } from 'react-leaflet'
 import { getBounds, getCenterOfBounds } from 'geolib'
-import { FlightContext } from '../contexts/FlightContext'
+import { FlightContext } from '../../contexts/FlightContext'
 
 export default function FlightTrack() {
   const [track, setTrack] = useState(null)
@@ -10,7 +10,6 @@ export default function FlightTrack() {
   const pathOptions = { color: 'red', weight: 2 }
 
   useEffect(() => {
-    console.log('ON PARSED & NEW FILE')
     eventBus.on('igcParsed', (igc) => {
       if (igc) {
         const trackCenter = getCenterOfBounds(igc.fixes)
@@ -27,7 +26,6 @@ export default function FlightTrack() {
     })
 
     eventBus.on('newFile', () => {
-      console.log('Resetting track')
       setTrack(null)
     })
   }, [])

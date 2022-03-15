@@ -3,31 +3,16 @@ import { Form, Col, Container, Row, Card, FloatingLabel } from 'react-bootstrap'
 import DropzoneFlight from './DropzoneFlight'
 import FlightMap from './FlightMap'
 import { Button } from 'react-bootstrap'
-import { FlightContext } from '../contexts/FlightContext'
+import { FlightContext } from '../../contexts/FlightContext'
 import SelectGliders from './SelectGliders'
 import PilotInfo from './PilotInfo'
+import ShowLaunchOrLanding from './ShowLaunchOrLanding'
+import MaxHeight from './MaxHeight'
+import FlightDate from './FlightDate'
 
 
 export default function FlightContainer() {
-  const { eventBus, flightSpecs } = useContext(FlightContext)
-
-  const flightDataModel = {
-    launchTime: 0,
-    landingTime: 0,
-    launchHeight: 0,
-    flightType: 0,
-    maxSpeed: 0,
-    minSpeed: 0,
-    maxClimb: 0,
-    maxSink: 0,
-    maxDist: 0,
-    pathLength: 0,
-    launchLandingDist: 0,
-    duration: 'Duration: --:--:--',
-    flightDate: 'Date: ....-..-..',
-    maxHeigth: 'Max Height: ----m'
-  }
-
+  const { eventBus, flightSpecs, saveFlightData } = useContext(FlightContext)
   const launchTime = useRef()
   const launchHeight = useRef()
   const landingTime = useRef()
@@ -37,29 +22,33 @@ export default function FlightContainer() {
   const maxDistanceRef = useRef()
   const pathLengthRef = useRef()
   const startLandingDistRef = useRef()
-  //const [duration, setDuration] = useState('Duration: --:--:--')
-  //const [flightDate, setFlightDate] = useState('Date: ....-..-..')
-  //const [maxHeigth, setMaxHeigth] = useState('Max Height: ----m')
-  const [flightData, setFlightData] = useState(flightDataModel)
+  const flightTypeRef = useRef()
+  const flightCommentsRef = useRef()
+  const [duration, setDuration] = useState('Duration: --:--:--')
+  const [flightDate, setFlightDate] = useState('Date: ....-..-..')
+  const [maxHeight, setMaxHeight] = useState(0)
+  const [launch, setLaunch] = useState(null)
+  const [landing, setLanding] = useState(null)
+
 
   useEffect(() => {
-    console.log('ON PARSED (FlightCont.)')
     eventBus.on('igcParsed', (igc) => {
-      setFlightData(flightSpecs => {
-        // const landing = (findLandingPoint(igc))
-        launchTime.current.value = flightData?.launch?.time
-        launchHeight.current.value = flightData?.launch?.pressureAltitude
-        landingTime.current.value = flightData?.landing?.time
-        const duration = calculateDuration(flightData?.launch?.time, flightData?.landing?.time)
-        // setFlightDate(`Date: ${igc.date}`)
-        // setMaxHeigth(`Max Height: ${getMaxHeight()} m`)
-        maxSpeedRef.current.value = flightData?.maxSpeed
-        maxClimbRef.current.value = flightData?.maxClimb
-        maxSinkRef.current.value = flightData?.maxSink
-        maxDistanceRef.current.value = flightData?.maxDist
-        pathLengthRef.current.value = flightData?.pathLength
-        startLandingDistRef.current.value = flightData?.launchLandingDist
-      })
+      launchTime.current.value = flightSpecs.launch.time
+      launchHeight.current.value = flightSpecs.launch.pressureAltitude
+      landingTime.current.value = flightSpecs.landing.time
+      maxSpeedRef.current.value = flightSpecs.maxSpeed.toFixed(2)
+      maxClimbRef.current.value = flightSpecs.maxClimb.toFixed(2)
+      maxSinkRef.current.value = flightSpecs.maxSink.toFixed(2)
+      maxDistanceRef.current.value = flightSpecs.maxDist.toFixed(2)
+      pathLengthRef.current.value = flightSpecs.pathLength.toFixed(2)
+      startLandingDistRef.current.value = flightSpecs.launchLandingDist.toFixed(2)
+      setDuration(calculateDuration(flightSpecs.launch.time, flightSpecs.landing.time))
+      setFlightDate(`Date: ${igc.date}`)
+      console.log(flightSpecs.maxHeight)
+      setMaxHeight(flightSpecs.maxHeight)
+      setLaunch(flightSpecs.launch)
+      setLanding(flightSpecs.landing)
+      flightTypeRef.current.value = flightSpecs.flightType
     })
   })
 
@@ -74,6 +63,24 @@ export default function FlightContainer() {
     }
   }
 
+  function handleSaveFlight() {
+    const dataToSave = {
+      launchTime: launchTime.current.value,
+      landingTime: landingTime.current.value,
+      LaunchHeight: launchHeight.current.value,
+      flightType: flightTypeRef.current.value,
+      maxSpeed: maxSpeedRef.current.value,
+      maxClimb: maxClimbRef.current.value,
+      maxSink: maxSinkRef.current.value,
+      maxDist: maxDistanceRef.current.value,
+      launchlandDist: startLandingDistRef.current.value,
+      pathLength: pathLengthRef.current.value,
+      comments: flightCommentsRef.current.value
+    }
+
+    saveFlightData(dataToSave)
+  }
+
   return (
     <>
       <Container>
@@ -83,14 +90,14 @@ export default function FlightContainer() {
           </Col>
         </Row>
         <Row className='flight-title'>
-          <Col sm>
-            <h2>{flightData.flightDate}</h2>
+          <Col sm className='text-center'>
+            <FlightDate flightDate={flightDate} />
           </Col>
-          <Col sm>
-            <h2>{flightData.duration}</h2>
+          <Col sm className='text-center'>
+            <h2>{duration}</h2>
           </Col>
-          <Col sm>
-            <h2>{flightData.maxHeigth}</h2>
+          <Col sm className='text-center'>
+            <MaxHeight maxHeight={maxHeight} />
           </Col>
         </Row>
         <Row className='p-3'>
@@ -101,7 +108,7 @@ export default function FlightContainer() {
             <DropzoneFlight />
           </Col>
           <Col sm={4} className='text-center' style={{ alignSelf: 'center' }}>
-            <Button variant='primary' size='lg'>Save Flight</Button>
+            <Button variant='primary' size='lg' onClick={handleSaveFlight}>Save Flight</Button>
           </Col>
         </Row>
 
@@ -110,18 +117,15 @@ export default function FlightContainer() {
             <SelectGliders />
           </Col>
           <Col sm>
-            <Row>
+            <Row className='p-2'>
               <Col>
-                <FloatingLabel label='Launch:'>
-                  <Form.Control id='start' type='text' placeholder='Launch' />
-                </FloatingLabel>
+                <ShowLaunchOrLanding site={{ type: 'Launch:', point: launch }} />
               </Col>
             </Row>
-            <Row>
+            <Row className='p-2'>
               <Col>
-                <FloatingLabel className='pt-2 p-0' label='Landing:'>
-                  <Form.Control id='landing' type='text' placeholder='Landing' />
-                </FloatingLabel>
+                <ShowLaunchOrLanding site={{ type: 'Landing:', point: landing }} />
+
               </Col>
             </Row>
           </Col>
@@ -144,20 +148,15 @@ export default function FlightContainer() {
           </Col>
           <Col sm>
             <FloatingLabel controlId='flightType' label='Flight type:'>
-              <Form.Select id='flightType'>
-                <option value='1'>Top-down flight</option>
-                <option value='2'>Soaring / thermal flight</option>
-                <option value='3'>Cross-country</option>
+              <Form.Select id='flightType' ref={flightTypeRef}>
+                <option value='top-down' >Top-down flight</option>
+                <option value='thermal' >Soaring / thermal flight</option>
+                <option value='x-country' >Cross-country</option>
               </Form.Select>
             </FloatingLabel>
           </Col>
         </Row>
         <Row className='pt-2'>
-          <Col>
-            <FloatingLabel label='Max Speed (kmh):'>
-              <Form.Control id='speed' type='text' placeholder='Max. Speed' ref={maxSpeedRef} />
-            </FloatingLabel>
-          </Col>
           <Col>
             <FloatingLabel label='Max Speed (kmh):'>
               <Form.Control id='speed' type='text' placeholder='Max. Speed' ref={maxSpeedRef} />
@@ -177,12 +176,12 @@ export default function FlightContainer() {
         <Row className='pt-2' >
           <Col sm>
             <FloatingLabel label='Max dist. from start (km):'>
-              <Form.Control id='maxDist' type='number' ref={maxDistanceRef} />
+              <Form.Control id='maxDist' type='number' placeholder='Max dist. from start' ref={maxDistanceRef} />
             </FloatingLabel>
           </Col>
           <Col sm>
-            <FloatingLabel label='Dist Launch-Landing (km):'>
-              <Form.Control id='path' type='text' placeholder='Dist Launch-Landing' ref={startLandingDistRef} />
+            <FloatingLabel label='Dist Launch Landing (km):'>
+              <Form.Control id='path' type='text' placeholder='Dist Launch Landing' ref={startLandingDistRef} />
             </FloatingLabel>
           </Col>
           <Col sm>
@@ -194,7 +193,7 @@ export default function FlightContainer() {
         <Row className='pt-2'>
           <Col sm>
             <FloatingLabel label='Flight Comments:'>
-              <Form.Control as="textarea" rows={6} placeholder='Flight Comments' />
+              <Form.Control as="textarea" rows={6} placeholder='Flight Comments' ref={flightCommentsRef} />
             </FloatingLabel>
           </Col>
         </Row>

@@ -3,7 +3,7 @@ import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { Badge, Card, Col, Row } from 'react-bootstrap'
 import EditGliders from './EditGliders'
 import ShowGliderDetails from './ShowGliderDetails'
-import DropzoneGlider from '../DropzoneGlider'
+import DropzoneGlider from './DropzoneGlider'
 
 
 export default function ShowGliders() {

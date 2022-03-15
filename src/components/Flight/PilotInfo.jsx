@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { ProfileDataContext } from '../contexts/ProfileDataContext'
+import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import LicenseInfo from './LicenseInfo'
 
 export default function PilotInfo() {
@@ -9,7 +9,6 @@ export default function PilotInfo() {
 
   useEffect(() => {
     if (!dataReady) {
-      console.log('Getting data from DB')
       getDataFromDb()
     }
   }, [])
@@ -21,6 +20,10 @@ export default function PilotInfo() {
   }
 
   return (
-    <h1>{pilot} - <LicenseInfo /></h1>
+    <>
+      <h1>{pilot}</h1>
+      <LicenseInfo />
+    </>
+
   )
 }

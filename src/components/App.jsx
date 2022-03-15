@@ -7,7 +7,7 @@ import Login from './Auth/Login';
 import ForgotPassword from './Auth/ForgotPassword';
 import { ProfileDataProvider } from '../contexts/ProfileDataContext';
 import '../css/bitacora.css'
-import FlightContainer from './FlightContainer';
+import FlightContainer from './Flight/FlightContainer';
 import FlightContextProvider from '../contexts/FlightContext';
 
 function App() {

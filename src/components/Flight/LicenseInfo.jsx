@@ -1,15 +1,16 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { ProfileDataContext } from '../contexts/ProfileDataContext'
+import { ProfileDataContext } from '../../contexts/ProfileDataContext'
+import { FlightContext } from '../../contexts/FlightContext'
 
 export default function LicenseInfo() {
   const { getProfileData } = useContext(ProfileDataContext)
+  const { setUsedLicense } = useContext(FlightContext)
   const [dataReady, setDataReady] = useState(false)
   const [licenses, setLicenses] = useState(null)
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
     if (!dataReady) {
-      console.log('Getting data from DB')
       getDataFromDb()
     }
   }, [])
@@ -26,6 +27,7 @@ export default function LicenseInfo() {
 
   function showLicense() {
     if (licenses) {
+      setUsedLicense(licenses[index])
       return licenses[index].id
     } else {
       return '?'
@@ -41,6 +43,6 @@ export default function LicenseInfo() {
   }
 
   return (
-    <span onClick={loopLicense} className='clickable-title'>{showLicense()}</span>
+    <h3 onClick={loopLicense} className='clickable-title'>{showLicense()}</h3>
   )
 }

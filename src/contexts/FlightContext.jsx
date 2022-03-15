@@ -1,22 +1,22 @@
-import React, { useState } from 'react'
+import React from 'react'
 import IGCParser from 'igc-parser'
-import { resolvePath } from 'react-router-dom'
 import { getRhumbLineBearing, getDistance, getPathLength } from 'geolib'
 
 export const FlightContext = React.createContext()
 
 export default function FlightContextProvider({ children }) {
   const diffData = []
+  let isThermalFlight = false
+  let isXcountry = false
 
   const flightSpecs = {
-    launchPoint: {},
-    landingPoint: {},
+    launch: {},
+    landing: {},
     launchTime: 0,
     landingTime: 0,
     launchHeight: 0,
-    flightType: 0,
+    flightType: 'top-down',
     maxSpeed: 0,
-    minSpeed: 0,
     maxClimb: 0,
     maxSink: 0,
     maxDist: 0,
@@ -24,7 +24,11 @@ export default function FlightContextProvider({ children }) {
     launchLandingDist: 0,
     duration: 'Duration: --:--:--',
     flightDate: 'Date: ....-..-..',
-    maxHeigth: 'Max Height: ----m'
+    maxHeight: 0,
+    launchName: '',
+    landingName: '',
+    gliderId: 0,
+    usedLicense: ''
   }
 
   const eventBus = {
@@ -41,8 +45,15 @@ export default function FlightContextProvider({ children }) {
 
   const flightContextValue = {
     eventBus,
+    diffData,
     flightSpecs: flightSpecs,
     loadIgcFile: loadIgcFile,
+    setLaunchOrLandingName: setLaunchOrLandingName,
+    setFlightDate: setFlightDate,
+    setMaxHeight: setMaxHeight,
+    setSelectedGlider: setSelectedGlider,
+    setUsedLicense: setUsedLicense,
+    saveFlightData: saveFlightData
   }
 
 
@@ -60,16 +71,16 @@ export default function FlightContextProvider({ children }) {
   function parseIgcFile(igcFile) {
 
     return new Promise((resolve, reject) => {
-      console.log('parsing igc file')
       const reader = new FileReader()
 
-      reader.onabort = () => console.log('file reading was aborted')
-      reader.onerror = () => console.log('file reading has failed')
+      reader.onabort = () => console.error('file reading was aborted')
+      reader.onerror = () => console.error('file reading has failed')
       reader.onload = () => {
         const text = reader.result
         let igc = IGCParser.parse(text)
         //setIgcObject(igc)
         console.log(igc)
+        diffData.length = 0
         getDirectData(igc)
         getDifferentialData(igc)
         resolve(igc)
@@ -101,16 +112,18 @@ export default function FlightContextProvider({ children }) {
   }
 
   function getDirectData(igcObject) {
-    flightSpecs.launchPoint = findStartingPoint(igcObject)
-    flightSpecs.landingPoint = findLandingPoint(igcObject)
+    flightSpecs.launch = findStartingPoint(igcObject)
+    flightSpecs.landing = findLandingPoint(igcObject)
     flightSpecs.launchLandingDist = launchLandingDistance(igcObject)
     flightSpecs.pathLength = getPathLength(igcObject.fixes) / 1000
     let start = igcObject.fixes[0]
     igcObject.fixes.forEach(fix => {
       flightSpecs.maxHeight = fix.pressureAltitude > flightSpecs.maxHeight ? fix.pressureAltitude : flightSpecs.maxHeight
       const distance = getDistance(start, fix) / 1000
-      flightSpecs.maxDistance = distance > flightSpecs.maxDistance ? distance : flightSpecs.maxDistance
+      flightSpecs.maxDist = distance > flightSpecs.maxDist ? distance : flightSpecs.maxDist
     })
+    console.log(flightSpecs.maxHeight)
+    isXcountry = flightSpecs.maxDist > 15 // More than 15 km away is X-country
   }
 
   function getDifferentialData(igcObject) {
@@ -119,6 +132,8 @@ export default function FlightContextProvider({ children }) {
     let prevHspeeds = [0]
     let avgVspeed = 0
     let avgHspeed = 0
+    let climbDataPoints = 0
+    let sinkDataPoints = 0
     igcObject.fixes.forEach((fix, idx) => {
       if (idx > 0) {
         const deltaT = ((fix.timestamp - prevFix.timestamp) / 1000)
@@ -131,7 +146,6 @@ export default function FlightContextProvider({ children }) {
           prevHspeeds.shift()
         }
         avgHspeed = ((prevHspeeds.reduce((tot, elem) => { return (tot + elem) })) / prevHspeeds.length) / 3.6
-
         flightSpecs.maxSpeed = flightSpecs.maxSpeed > avgHspeed ? flightSpecs.maxSpeed : avgHspeed
 
         prevVspeeds.push(vSpeed)
@@ -141,7 +155,11 @@ export default function FlightContextProvider({ children }) {
         avgVspeed = (prevVspeeds.reduce((tot, elem) => { return (tot + elem) })) / prevVspeeds.length
         flightSpecs.maxClimb = flightSpecs.maxClimb > avgVspeed ? flightSpecs.maxClimb : avgVspeed
         flightSpecs.maxSink = flightSpecs.maxSink < avgVspeed ? flightSpecs.maxSink : avgVspeed
-
+        if (avgVspeed > 0) {
+          climbDataPoints++
+        } else {
+          sinkDataPoints++
+        }
 
         diffData.push({
           verticalSpeed: avgVspeed,
@@ -153,6 +171,44 @@ export default function FlightContextProvider({ children }) {
         prevFix = fix
       }
     })
+    isThermalFlight = (climbDataPoints / sinkDataPoints) > 0.25 // More than 25% of the time climbing
+    flightSpecs.flightType = 'top-down'
+    if (isThermalFlight) {
+      flightSpecs.flightType = 'thermal'
+      if (isXcountry) {
+        flightSpecs.flightType = 'x-country'
+      }
+    }
+  }
+
+  function setLaunchOrLandingName(siteInfo) {
+    if (siteInfo.type === 'Launch:') {
+      flightSpecs.launchName = siteInfo.name
+    } else {
+      flightSpecs.landingName = siteInfo.name
+    }
+  }
+
+  function setFlightDate(dateInfo) {
+    flightSpecs.flightDate = dateInfo
+  }
+
+  function setMaxHeight(heightInfo) {
+    flightSpecs.maxHeight = heightInfo
+  }
+
+  function setSelectedGlider(gliderInfo) {
+    flightSpecs.gliderId = gliderInfo.id
+  }
+
+  function setUsedLicense(licenseInfo) {
+    flightSpecs.usedLicense = licenseInfo
+  }
+
+  function saveFlightData(dataToSave) {
+    console.log(dataToSave)
+    console.log(flightSpecs)
+
   }
 
   return (

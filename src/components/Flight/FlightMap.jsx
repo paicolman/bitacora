@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import { Accordion } from 'react-bootstrap'
-import { FlightContext } from '../contexts/FlightContext'
+import { FlightContext } from '../../contexts/FlightContext'
 import FlightTrack from './FlightTrack'
 import FlightChart from './FlightChart'
 
@@ -13,7 +13,6 @@ export default function FlightMap() {
   //const map = useMap()
 
   useEffect(() => {
-    console.log('ON MOUSE MOVE')
     eventBus.on('mouseOnChart', (data) => {
       if (data.activePayload) {
         const lat = data.activePayload[0].payload.latitude

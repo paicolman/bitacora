@@ -1,10 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { ProfileDataContext } from '../contexts/ProfileDataContext'
+import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { getStorage, ref, getDownloadURL } from 'firebase/storage'
 import { Card, Row, Col, Form, Image } from 'react-bootstrap'
+import { FlightContext } from '../../contexts/FlightContext'
 
 export default function SelectGliders() {
   const { getProfileData } = useContext(ProfileDataContext)
+  const { setSelectedGlider } = useContext(FlightContext)
   const [dataReady, setDataReady] = useState(false)
   const [gliders, setgliders] = useState(null)
   const [activeGlider, setActiveGlider] = useState({ type: '', model: '', nickname: '' })
@@ -13,7 +15,6 @@ export default function SelectGliders() {
 
   useEffect(() => {
     if (!dataReady) {
-      console.log('Getting data from DB')
       getDataFromDb()
     }
   }, [])
@@ -32,6 +33,7 @@ export default function SelectGliders() {
     getPicUrl(selected[0].id)
     setActiveGlider(selected[0])
     setSwitched(true)
+    setSelectedGlider(selected[0])
   }
 
   function getPicUrl(gliderId) {
@@ -65,6 +67,7 @@ export default function SelectGliders() {
           model: defaultGlider.model,
           nickname: defaultGlider.nickname
         })
+        setSelectedGlider(defaultGlider)
       }
 
       return (
