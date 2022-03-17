@@ -9,6 +9,7 @@ import PilotInfo from './PilotInfo'
 import ShowLaunchOrLanding from './ShowLaunchOrLanding'
 import MaxHeight from './MaxHeight'
 import FlightDate from './FlightDate'
+import AppHeader from '../AppHeader'
 
 
 export default function FlightContainer() {
@@ -24,8 +25,8 @@ export default function FlightContainer() {
   const startLandingDistRef = useRef()
   const flightTypeRef = useRef()
   const flightCommentsRef = useRef()
-  const [duration, setDuration] = useState('Duration: --:--:--')
-  const [flightDate, setFlightDate] = useState('Date: ....-..-..')
+  const [duration, setDuration] = useState('00:00:00')
+  const [flightDate, setFlightDate] = useState('yyyy-mm-dd')
   const [maxHeight, setMaxHeight] = useState(0)
   const [launch, setLaunch] = useState(null)
   const [landing, setLanding] = useState(null)
@@ -43,7 +44,7 @@ export default function FlightContainer() {
       pathLengthRef.current.value = flightSpecs.pathLength.toFixed(2)
       startLandingDistRef.current.value = flightSpecs.launchLandingDist.toFixed(2)
       setDuration(calculateDuration(flightSpecs.launch.time, flightSpecs.landing.time))
-      setFlightDate(`Date: ${igc.date}`)
+      setFlightDate(igc.date)
       console.log(flightSpecs.maxHeight)
       setMaxHeight(flightSpecs.maxHeight)
       setLaunch(flightSpecs.launch)
@@ -57,9 +58,9 @@ export default function FlightContainer() {
       const launchPartsinSec = startTime.split(':').reduce((acc, time) => (60 * acc) + +time)
       const landPartsInSec = endTime.split(':').reduce((acc, time) => (60 * acc) + +time)
       const durationDate = new Date((landPartsInSec - launchPartsinSec) * 1000).toISOString().slice(11, 19)
-      return (`Duration: ${durationDate}`)
+      return durationDate
     } else {
-      return ('Duration: --:--:--')
+      return ('00:00:00')
     }
   }
 
@@ -67,22 +68,28 @@ export default function FlightContainer() {
     const dataToSave = {
       launchTime: launchTime.current.value,
       landingTime: landingTime.current.value,
-      LaunchHeight: launchHeight.current.value,
+      duration: duration,
+      launchHeight: parseInt(launchHeight.current.value),
       flightType: flightTypeRef.current.value,
-      maxSpeed: maxSpeedRef.current.value,
-      maxClimb: maxClimbRef.current.value,
-      maxSink: maxSinkRef.current.value,
-      maxDist: maxDistanceRef.current.value,
-      launchlandDist: startLandingDistRef.current.value,
-      pathLength: pathLengthRef.current.value,
+      maxSpeed: parseFloat(maxSpeedRef.current.value),
+      maxClimb: parseFloat(maxClimbRef.current.value),
+      maxSink: parseFloat(maxSinkRef.current.value),
+      maxDist: parseFloat(maxDistanceRef.current.value),
+      launchlandDist: parseFloat(startLandingDistRef.current.value),
+      pathLength: parseFloat(pathLengthRef.current.value),
       comments: flightCommentsRef.current.value
     }
 
     saveFlightData(dataToSave)
   }
 
+  function handleGoBack() {
+    window.location = '/'
+  }
+
   return (
     <>
+      <AppHeader logoutUser={true} />
       <Container>
         <Row>
           <Col sm className='text-center'>
@@ -94,7 +101,7 @@ export default function FlightContainer() {
             <FlightDate flightDate={flightDate} />
           </Col>
           <Col sm className='text-center'>
-            <h2>{duration}</h2>
+            <h2>Duration: {duration}</h2>
           </Col>
           <Col sm className='text-center'>
             <MaxHeight maxHeight={maxHeight} />
@@ -108,7 +115,12 @@ export default function FlightContainer() {
             <DropzoneFlight />
           </Col>
           <Col sm={4} className='text-center' style={{ alignSelf: 'center' }}>
-            <Button variant='primary' size='lg' onClick={handleSaveFlight}>Save Flight</Button>
+            <Row className='pt-2'>
+              <Button variant='primary' size='lg' onClick={handleSaveFlight}>Save Flight</Button>
+            </Row>
+            <Row className='pt-2'>
+              <Button variant='secondary' size='lg' onClick={handleGoBack}>Back</Button>
+            </Row>
           </Col>
         </Row>
 

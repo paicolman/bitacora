@@ -27,7 +27,7 @@ export default function LicenseInfo() {
 
   function showLicense() {
     if (licenses) {
-      setUsedLicense(licenses[index])
+      setUsedLicense(licenses[index].id)
       return licenses[index].id
     } else {
       return '?'

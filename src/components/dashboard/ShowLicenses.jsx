@@ -55,12 +55,12 @@ export default function ShowLicenses() {
 
   return (
     <>
-      <Card className='licenses-card'>
-        <Card.Header>Licenses</Card.Header>
+      <div className={'licenses-container'}>
+        <h4>Licenses</h4>
         <ListGroup variant="flush" >
           {licenseList()}
         </ListGroup>
-      </Card>
+      </div>
       <Badge pill bg="primary" onClick={handleOpenDlg}>
         Change this
       </Badge>
@@ -68,6 +68,5 @@ export default function ShowLicenses() {
         {openDlg}
       </div>
     </>
-
   )
 }

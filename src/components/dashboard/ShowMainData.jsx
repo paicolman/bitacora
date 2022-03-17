@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react'
 import { ProfileDataContext } from '../../contexts/ProfileDataContext'
-import { Badge, Card } from 'react-bootstrap'
+import { Badge, Card, Row, Col, Button } from 'react-bootstrap'
 import EditMainData from './EditMainData'
 import ShowLicenses from './ShowLicenses'
+import { render } from '@testing-library/react'
 
 export default function ShowMainData({ newPilot }) {
 
@@ -56,6 +57,10 @@ export default function ShowMainData({ newPilot }) {
     setOpenDlg(null)
   }
 
+  function handleNewFlightClick() {
+    window.location = '/newFlight'
+  }
+
   return (
     <>
       <Card className='profile-container text-center'>
@@ -66,8 +71,23 @@ export default function ShowMainData({ newPilot }) {
             Change this
           </Badge>
         </Card.Subtitle>
-        <Card.Body className='text-center licenses-container'>
-          <ShowLicenses />
+        <Card.Body>
+          <Row>
+            <Col sm={8}>
+              <ShowLicenses />
+            </Col>
+            <Col sm={4} className='text-end'>
+              <Row className='pt-2 text-right'>
+                <Button variant='primary' size='lg' style={{ maxWidth: '300px' }} onClick={handleNewFlightClick} >Log New Flight</Button>
+              </Row>
+              <Row className='pt-2'>
+                <Button variant='primary' size='lg' style={{ maxWidth: '300px' }}>Check Flight Book</Button>
+              </Row>
+              <Row className='pt-2'>
+                <Button variant='primary' size='lg' style={{ maxWidth: '300px' }}>Bulk Upload</Button>
+              </Row>
+            </Col>
+          </Row>
         </Card.Body>
       </Card>
       <div id='mainDataPopup'>

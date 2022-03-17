@@ -2,8 +2,9 @@ import React, { useContext, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import PilotDashboard from '../Dashboard/PilotDashboard'
+import FlightContainer from './FlightContainer'
 
-export default function LoginLanding() {
+export default function NewFlight() {
   const [userStatus, setUserStatus] = useState('waiting')
   const { pilotIsRegistered } = useContext(ProfileDataContext)
 
@@ -26,7 +27,7 @@ export default function LoginLanding() {
         retval = <PilotDashboard newPilot={true} />
         break
       case 'registered':
-        retval = <PilotDashboard newPilot={false} />
+        retval = <FlightContainer />
         break
       default:
         break

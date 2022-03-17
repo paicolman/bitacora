@@ -39,7 +39,7 @@ export default function FlightDate({ flightDate }) {
 
   return (
     <>
-      <h2 onClick={handleClick} className='clickable-title'>{flyDate}</h2>
+      <h2 onClick={handleClick} className='clickable-title'>Date: {flyDate}</h2>
       {openDlg}
     </>
 

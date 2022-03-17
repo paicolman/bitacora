@@ -9,6 +9,7 @@ export default function AppHeader({ logoutUser }) {
 
   function handleLogout() {
     logout()
+    window.location = '/login'
   }
   function setLink() {
     return logoutUser ? <button className='btn btn-link' onClick={handleLogout}>Log-out</button> : <Link to="/login">Log-in</Link>

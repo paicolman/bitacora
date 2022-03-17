@@ -13,10 +13,6 @@ export default function ShowGliders() {
   const [openDlg, setOpenDlg] = useState(null)
   const [openDetailsDlg, setOpenDetailsDlg] = useState(null)
 
-
-
-
-
   async function getDataFromDb() {
     if (!dataReady) {
 

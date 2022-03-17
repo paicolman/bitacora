@@ -7,13 +7,13 @@ import Login from './Auth/Login';
 import ForgotPassword from './Auth/ForgotPassword';
 import { ProfileDataProvider } from '../contexts/ProfileDataContext';
 import '../css/bitacora.css'
-import FlightContainer from './Flight/FlightContainer';
+import NewFlight from './Flight/NewFlight';
 import FlightContextProvider from '../contexts/FlightContext';
+import BulkUploadDropzone from './Bulk/BulkUploadDropzone';
 
 function App() {
   return (
     <>
-
       <Navigate>
         <AuthProvider>
           <Routes>
@@ -28,14 +28,27 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route exact path="/flights" element={
-              <><AuthProvider>
-                <ProfileDataProvider>
-                  <FlightContextProvider>
-                    <FlightContainer />
-                  </FlightContextProvider>
-                </ProfileDataProvider>
-              </AuthProvider>
+            <Route exact path="/newflight" element={
+              <>
+                <AuthProvider>
+                  <ProfileDataProvider>
+                    <FlightContextProvider>
+                      <NewFlight />
+                    </FlightContextProvider>
+                  </ProfileDataProvider>
+                </AuthProvider>
+              </>
+            }
+            />
+            <Route exact path="/bulk" element={
+              <>
+                <AuthProvider>
+                  <ProfileDataProvider>
+                    <FlightContextProvider>
+                      <BulkUploadDropzone />
+                    </FlightContextProvider>
+                  </ProfileDataProvider>
+                </AuthProvider>
               </>
             }
             />

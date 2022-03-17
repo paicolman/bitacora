@@ -37,7 +37,6 @@ export function ProfileDataProvider({ children }) {
     unsuscribe.apply() // To prevent repeated writing on changes
   }
 
-  //! Rename to getProfileData or somethin'
   function getProfileData(path) {
     const db = getDatabase(app)
     const pilotRef = ref(db, `${currentUser.uid}${path}`)
@@ -111,10 +110,6 @@ export function ProfileDataProvider({ children }) {
     onValue(dbRef, (snapshot) => {
       //const registeredPilots = Object.keys(snapshot.val())
       const pilotExist = true
-      console.log('Set Breakpoint here...')
-      // registeredPilots.filter((regPilot) => {
-      //   return regPilot === currentUser.uid
-      // }).length > 0
       if (!preventFlood) {
         const newPilotRef = child(dbRef, `${currentUser.uid}`)
         set(newPilotRef, {

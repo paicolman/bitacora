@@ -45,7 +45,6 @@ export default function DropzoneGlider({ gliderId }) {
           uploadBytes(picRef, gliderPic).then((snapshot) => {
             setGliderpic(null)
           })
-
         })
       })
     })
