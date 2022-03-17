@@ -39,12 +39,8 @@ export default function BulkUpload({ files }) {
         resolve()
       }
       else {
-        console.log('Parsing...')
         parseIgcFile(file.file).then((igc) => {
-          console.log('Finished Parsing...')
-          console.log('Populating...')
           populateFlightSpecs(igc).then(() => {
-            console.log('NEXT!')
             resolve()
           })
         })
@@ -65,8 +61,6 @@ export default function BulkUpload({ files }) {
       getStartPlace(launch, () => { })
       const landing = { type: 'Landing:', point: flightSpecs.landing }
       getStartPlace(landing, () => {
-        console.log('Finished populating!')
-        console.log(JSON.stringify(flightSpecs))
         resolve()
       })
     })
