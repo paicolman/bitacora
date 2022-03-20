@@ -13,11 +13,13 @@ export default function ListIgcFiles({ files }) {
 
   function handleSelect(e) {
     const index = parseInt(e.target.id.split('_')[1])
+    files[0].onClose = handleCloseDlg // ref put in the first element of files object for simplicity
     files[index].import = e.target.checked
     listFiles()
   }
 
   function handleSelectAll(e) {
+    files[0].onClose = handleCloseDlg // ref put in the first element of files object for simplicity
     files = files.map(item => {
       item.import = e.target.checked
       return item
@@ -28,6 +30,10 @@ export default function ListIgcFiles({ files }) {
 
   function handleOpenDlg() {
     setOpenDlg(<BulkUpload files={files} />)
+  }
+
+  function handleCloseDlg() {
+    setOpenDlg(null)
   }
 
   function listFiles() {

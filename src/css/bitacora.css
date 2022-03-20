@@ -66,3 +66,15 @@ div#root {
 .clickable-title {
   color: darkBlue;
 }
+.ongoing {
+  color: orange;
+  font-weight: bold;
+}
+.upload-error {
+  color: red;
+  font-weight: bold;
+}
+.uploaded {
+  color: green;
+  font-weight: bold;
+}

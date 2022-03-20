@@ -56,13 +56,15 @@ export default function FlightContextProvider({ children }) {
     flightSpecs: flightSpecs,
     loadIgcFile: loadIgcFile,
     parseIgcFile: parseIgcFile,
+    setIgcFileForDB: setIgcFileForDB,
     getStartPlace: getStartPlace,
     setLaunchOrLandingName: setLaunchOrLandingName,
     setFlightDate: setFlightDate,
     setMaxHeight: setMaxHeight,
     setSelectedGlider: setSelectedGlider,
     setUsedLicense: setUsedLicense,
-    saveFlightData: saveFlightData
+    saveFlightData: saveFlightData,
+    checkAndStoreNewFlight: checkAndStoreNewFlight
   }
 
 
@@ -76,6 +78,12 @@ export default function FlightContextProvider({ children }) {
       console.log('Error parsing')
       console.log(e)
     })
+  }
+
+  function setIgcFileForDB(igc) {
+    if (igc) {
+      igcFileForDB = igc
+    }
   }
 
   function parseIgcFile(igcFile) {
@@ -255,7 +263,6 @@ export default function FlightContextProvider({ children }) {
     flightSpecs.maxSpeed = isNaN(dataToSave.maxSpeed) ? 0 : dataToSave.maxSpeed
     flightSpecs.pathLength = isNaN(dataToSave.pathLength) ? 0 : dataToSave.pathLength
     flightSpecs.comments = dataToSave.comments
-
     checkAndStoreNewFlight()
   }
 
@@ -267,32 +274,45 @@ export default function FlightContextProvider({ children }) {
   }
 
   function checkAndStoreNewFlight() {
-    const db = getDatabase(app)
-    const existingFlightsRef = ref(db, `${currentUser.uid}/flights`)
-    onValue(existingFlightsRef, (snapshot) => {
-      let duplicate = false
-      const flights = snapshot.val()
-      for (const flightId in flights) {
-        duplicate = (flights[flightId].flightDate === flightSpecs.flightDate) && (flights[flightId].launchTime === flightSpecs.launchTime)
-        if (duplicate) break
-      }
-      if (!duplicate) {
-        const flightId = uuid()
-        const flightRef = ref(db, `${currentUser.uid}/flights/${flightId}`)
-        console.log(flightRef)
-        onValue(flightRef, (snapshot) => {
-          set(flightRef, flightSpecs)
-          console.log('flight saved, no lets save the igc file')
-          if (igcFileForDB) {
-            storeIgc(flightId)
+    return new Promise((resolve, reject) => {
+      const db = getDatabase(app)
+      const existingFlightsRef = ref(db, `${currentUser.uid}/flights`)
+      const unsuscribeExistingRef = onValue(existingFlightsRef, (snapshot) => {
+        let duplicate = false
+        const flights = snapshot.val()
+        console.log(flights)
+        for (const flightId in flights) {
+          duplicate = (flights[flightId].flightDate === flightSpecs.flightDate) && (flights[flightId].launchTime === flightSpecs.launchTime)
+          if (duplicate) {
+            console.log(flights[flightId].flightDate, flightSpecs.flightDate, flights[flightId].launchTime, flightSpecs.launchTime)
+            break
           }
-          console.log('Flight saved!!! --> Callback here!')
-        }, (err) => { console.error(err) }, false)
-      } else {
-        console.log('ErrorCallback here')
-      }
+        }
+        if (!duplicate) {
+          unsuscribeExistingRef.apply()
+          const flightId = uuid()
+          const flightRef = ref(db, `${currentUser.uid}/flights/${flightId}`)
+          onValue(flightRef, () => {
+            set(flightRef, flightSpecs)
+            console.log('flight saved, now lets save the igc file')
+            if (igcFileForDB) {
+              storeIgc(flightId)
+              console.log('igc file saved')
+            }
+            console.log('Flight saved!!! --> Callback here!')
+            unsuscribeExistingRef.apply()
+            resolve('UPLOADED')
+          }, (err) => {
+            console.error(err)
+            resolve(err)
+          }, false)
+        } else {
+          console.error('Flight is duplicated in DB')
+          unsuscribeExistingRef.apply()
+          resolve('DUPLICATE')
+        }
+      })
     })
-
   }
 
   return (

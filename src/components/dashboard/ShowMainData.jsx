@@ -3,7 +3,6 @@ import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { Badge, Card, Row, Col, Button } from 'react-bootstrap'
 import EditMainData from './EditMainData'
 import ShowLicenses from './ShowLicenses'
-import { render } from '@testing-library/react'
 
 export default function ShowMainData({ newPilot }) {
 
