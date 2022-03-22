@@ -78,3 +78,16 @@ div#root {
   color: green;
   font-weight: bold;
 }
+.gradient{
+  background: rgb(200,200,200);
+  background: linear-gradient(90deg, rgba(200,200,200,1) 0%, rgba(255,255,255,1) 100%);
+}
+.success{
+  background: rgba(0, 255, 98, 0.5) !important;
+}
+.warning{
+  background: rgba(255, 208, 1, 0.5) !important;
+}
+.error{
+  background: rgba(255, 59, 59, 0.5) !important;
+}

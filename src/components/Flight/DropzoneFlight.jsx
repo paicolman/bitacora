@@ -4,7 +4,7 @@ import { Card, Image } from 'react-bootstrap'
 import { FlightContext } from '../../contexts/FlightContext'
 
 
-export default function DropzoneFlight() {
+export default function DropzoneFlight({ image }) {
   const { eventBus, loadIgcFile } = useContext(FlightContext)
 
   const onDrop = useCallback(acceptedFiles => {
@@ -26,7 +26,7 @@ export default function DropzoneFlight() {
         <div {...getRootProps()}>
           <input {...getInputProps()} />
           {
-            <Image src='assets/igc_nofile.png' />
+            <Image src={image} />
           }
         </div>
       </Card.Body>

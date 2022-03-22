@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Button, Row, Col, Form, ListGroup } from 'react-bootstrap'
 import BulkUpload from './BulkUpload'
 
@@ -6,6 +6,8 @@ import BulkUpload from './BulkUpload'
 export default function ListIgcFiles({ files }) {
   const [displayFiles, setDisplayFiles] = useState('No Files available yet...')
   const [openDlg, setOpenDlg] = useState(null)
+  const uploadButton = useRef()
+  let disabled = true
 
   useEffect(() => {
     listFiles()
@@ -16,6 +18,7 @@ export default function ListIgcFiles({ files }) {
     files[0].onClose = handleCloseDlg // ref put in the first element of files object for simplicity
     files[index].import = e.target.checked
     listFiles()
+    anySelected()
   }
 
   function handleSelectAll(e) {
@@ -25,10 +28,24 @@ export default function ListIgcFiles({ files }) {
       return item
     })
     listFiles()
+    anySelected()
   }
 
+  function anySelected() {
+    let anySelected = false
+    if (files) {
+      anySelected = files.some(file => {
+        return file.import
+      })
+    }
+    disabled = !anySelected
+    if (uploadButton) {
+      uploadButton.current.disabled = !anySelected
+    }
 
+  }
   function handleOpenDlg() {
+    console.log('UPLOAD dammit')
     setOpenDlg(<BulkUpload files={files} />)
   }
 
@@ -78,7 +95,7 @@ export default function ListIgcFiles({ files }) {
           </div>
         </div>
         <Row className='pt-2 d-flex justify-content-center'>
-          <Button variant='primary' size='lg' style={{ maxWidth: '200px' }} onClick={handleOpenDlg}>Upload</Button>
+          <Button ref={uploadButton} variant='primary' size='lg' style={{ maxWidth: '200px' }} onClick={handleOpenDlg}>Upload</Button>
         </Row>
       </>
     )

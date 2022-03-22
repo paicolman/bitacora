@@ -9,7 +9,9 @@ import { ProfileDataProvider } from '../contexts/ProfileDataContext';
 import '../css/bitacora.css'
 import NewFlight from './Flight/NewFlight';
 import FlightContextProvider from '../contexts/FlightContext';
-import BulkUploadDropzone from './Bulk/BulkUploadDropzone';
+import BulkNavigate from './Bulk/BulkNavigate';
+import FlightBook from './Book/FlightBook';
+import DbFlightContextProvider from '../contexts/DbFlightContext';
 
 function App() {
   return (
@@ -38,20 +40,29 @@ function App() {
                   </ProfileDataProvider>
                 </AuthProvider>
               </>
-            }
-            />
+            } />
             <Route exact path="/bulk" element={
               <>
                 <AuthProvider>
                   <ProfileDataProvider>
                     <FlightContextProvider>
-                      <BulkUploadDropzone />
+                      <BulkNavigate />
                     </FlightContextProvider>
                   </ProfileDataProvider>
                 </AuthProvider>
               </>
-            }
-            />
+            } />
+            <Route exact path="/book" element={
+              <>
+                <AuthProvider>
+                  <ProfileDataProvider>
+                    <DbFlightContextProvider>
+                      <FlightBook />
+                    </DbFlightContextProvider>
+                  </ProfileDataProvider>
+                </AuthProvider>
+              </>
+            } />
           </Routes>
         </AuthProvider>
       </Navigate>

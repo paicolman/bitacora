@@ -6,6 +6,7 @@ import ListIgcFiles from './ListIgcFiles'
 
 export default function BulkUploadDropzone() {
   const [files, setFiles] = useState(null)
+  const [image, setImage] = useState('assets/igc_nofile.png')
 
   const onDrop = useCallback(dumpedFiles => {
     const acceptedFiles = dumpedFiles.filter(file => {
@@ -18,6 +19,7 @@ export default function BulkUploadDropzone() {
       }
     })
     console.log(fileList)
+    setImage('assets/has_igc.png')
     setFiles(fileList)
   }, [])
 
@@ -30,8 +32,8 @@ export default function BulkUploadDropzone() {
 
   return (
     <>
-      <AppHeader logoutUser={true} />
       <Container className='text-center'>
+        <AppHeader props={{ home: true, logoutUser: true }} />
         <h2>Bulk upload</h2>
         <Card>
           <Card.Title className='text-center'>
@@ -42,7 +44,7 @@ export default function BulkUploadDropzone() {
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {
-                <Image src='assets/igc_nofile.png' />
+                <Image src={image} />
               }
             </div>
           </Card.Body>

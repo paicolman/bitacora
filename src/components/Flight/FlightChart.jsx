@@ -7,6 +7,10 @@ export default function FlightChart({ chartType }) {
   const { eventBus, diffData } = useContext(FlightContext)
 
   useEffect(() => {
+    eventBus.on('newFile', () => {
+      setData(null)
+    })
+
     eventBus.on('igcParsed', (igc) => {
       if (chartType === 'pressureAltitude') {
         setData(igc.fixes)

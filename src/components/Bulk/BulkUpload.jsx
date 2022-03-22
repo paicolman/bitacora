@@ -4,7 +4,7 @@ import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { FlightContext } from '../../contexts/FlightContext'
 
 export default function BulkUpload({ files }) {
-  const { parseIgcFile, setIgcFileForDB, flightSpecs, getStartPlace, setFlightDate, checkAndStoreNewFlight } = useContext(FlightContext)
+  const { parseIgcFile, setIgcFileForDB, flightSpecs, getStartOrLanding, setFlightDate, checkAndStoreNewFlight } = useContext(FlightContext)
   const { getProfileData } = useContext(ProfileDataContext)
   const [show, setShow] = useState(true)
   const [uploadNames, setUploadNames] = useState([])
@@ -117,12 +117,12 @@ export default function BulkUpload({ files }) {
       flightSpecs.launchTime = flightSpecs.launch.time
       flightSpecs.landingTime = flightSpecs.landing.time
       flightSpecs.duration = calculateDuration(flightSpecs.launchTime, flightSpecs.landingTime)
-      flightSpecs.launchHeight = flightSpecs.landing.pressureAltitude
+      flightSpecs.launchHeight = flightSpecs.launch.pressureAltitude
       flightSpecs.comment = ''
       const launch = { type: 'Launch:', point: flightSpecs.launch }
-      getStartPlace(launch, () => { })
+      getStartOrLanding(launch, () => { })
       const landing = { type: 'Landing:', point: flightSpecs.landing }
-      getStartPlace(landing, () => {
+      getStartOrLanding(landing, () => {
         resolve()
       })
     })

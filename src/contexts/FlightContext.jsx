@@ -3,17 +3,17 @@ import IGCParser from 'igc-parser'
 import { getRhumbLineBearing, getDistance, getPathLength } from 'geolib'
 import { useAuth } from '../contexts/AuthContext'
 import app from '../firebase'
-import { getDatabase, onValue, ref, set, child } from 'firebase/database'
+import { getDatabase, onValue, ref, set } from 'firebase/database'
 import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage'
 import uuid from 'react-uuid'
 
 export const FlightContext = React.createContext()
 
 export default function FlightContextProvider({ children }) {
+  const { currentUser } = useAuth()
   const diffData = []
   let isThermalFlight = false
   let isXcountry = false
-  const { currentUser } = useAuth()
   let igcFileForDB = null
 
   const flightSpecs = {
@@ -35,7 +35,8 @@ export default function FlightContextProvider({ children }) {
     launchName: '',
     landingName: '',
     gliderId: 0,
-    usedLicense: ''
+    usedLicense: '',
+    hasIgc: false
   }
 
   const eventBus = {
@@ -55,9 +56,10 @@ export default function FlightContextProvider({ children }) {
     diffData,
     flightSpecs: flightSpecs,
     loadIgcFile: loadIgcFile,
+    discardIgc: discardIgc,
     parseIgcFile: parseIgcFile,
     setIgcFileForDB: setIgcFileForDB,
-    getStartPlace: getStartPlace,
+    getStartOrLanding: getStartOrLanding,
     setLaunchOrLandingName: setLaunchOrLandingName,
     setFlightDate: setFlightDate,
     setMaxHeight: setMaxHeight,
@@ -80,6 +82,10 @@ export default function FlightContextProvider({ children }) {
     })
   }
 
+  function discardIgc() {
+    eventBus.dispatch('newFile', null)
+  }
+
   function setIgcFileForDB(igc) {
     if (igc) {
       igcFileForDB = igc
@@ -97,6 +103,8 @@ export default function FlightContextProvider({ children }) {
         const text = reader.result
         let igc = IGCParser.parse(text)
         diffData.length = 0
+        flightSpecs.hasIgc = true
+        clearFlightSpecs()
         getDirectData(igc)
         getDifferentialData(igc)
         resolve(igc)
@@ -107,6 +115,26 @@ export default function FlightContextProvider({ children }) {
         reject('Could not read the selected file')
       }
     })
+  }
+
+  function clearFlightSpecs() {
+    flightSpecs.launch = {}
+    flightSpecs.landing = {}
+    flightSpecs.launchTime = 0
+    flightSpecs.landingTime = 0
+    flightSpecs.launchHeight = 0
+    flightSpecs.flightType = 'top-down'
+    flightSpecs.maxSpeed = 0
+    flightSpecs.maxClimb = 0
+    flightSpecs.maxSink = 0
+    flightSpecs.maxDist = 0
+    flightSpecs.pathLength = 0
+    flightSpecs.launchLandingDist = 0
+    flightSpecs.duration = '--:--:--'
+    flightSpecs.flightDate = '....-..-..'
+    flightSpecs.maxHeight = 0
+    flightSpecs.launchName = ''
+    flightSpecs.landingName = ''
   }
 
   function findStartingPoint(igcObject) {
@@ -196,12 +224,8 @@ export default function FlightContextProvider({ children }) {
     }
   }
 
-  //! Refactor: Rename to getStartOrLanding o so...
-  function getStartPlace(site, callback) {
-    let filePath = 'assets/launches.json'
-    if (site.type === 'Landing:') {
-      filePath = 'assets/landings.json'
-    }
+  function getStartOrLanding(site, callback) {
+    const filePath = 'assets/flyingSpots.json'
     fetch(filePath
       , {
         headers: {
@@ -212,8 +236,10 @@ export default function FlightContextProvider({ children }) {
         return response.json()
       }).then(places => {
         const startOrLanding = places.filter(place => {
-          if (site.point) {
-            return (getDistance(place, site.point) < 100)
+          if (site.point) { // && !isNaN(parseFloat(place.longitude)) && isNaN(parseFloat(place.latitude))
+            const dist = getDistance(place, site.point)
+            if (dist < 300) console.log(dist, place)
+            return (dist < 300)
           } else {
             return null
           }
@@ -221,6 +247,8 @@ export default function FlightContextProvider({ children }) {
         callback(startOrLanding[0])
         if (startOrLanding[0]) {
           setLaunchOrLandingName({ type: site.type, name: startOrLanding[0].name })
+        } else {
+          setLaunchOrLandingName({ type: site.type, name: '' })
         }
       })
   }
@@ -236,6 +264,7 @@ export default function FlightContextProvider({ children }) {
 
   function setFlightDate(dateInfo) {
     flightSpecs.flightDate = dateInfo
+    eventBus.dispatch('newDate')
   }
 
   function setMaxHeight(heightInfo) {
@@ -263,7 +292,7 @@ export default function FlightContextProvider({ children }) {
     flightSpecs.maxSpeed = isNaN(dataToSave.maxSpeed) ? 0 : dataToSave.maxSpeed
     flightSpecs.pathLength = isNaN(dataToSave.pathLength) ? 0 : dataToSave.pathLength
     flightSpecs.comments = dataToSave.comments
-    checkAndStoreNewFlight()
+    return checkAndStoreNewFlight()
   }
 
   function storeIgc(uniqueId) {
@@ -277,9 +306,11 @@ export default function FlightContextProvider({ children }) {
     return new Promise((resolve, reject) => {
       const db = getDatabase(app)
       const existingFlightsRef = ref(db, `${currentUser.uid}/flights`)
-      const unsuscribeExistingRef = onValue(existingFlightsRef, (snapshot) => {
-        let duplicate = false
+      let duplicate = false
+      const unsuscribeExisting = onValue(existingFlightsRef, (snapshot) => {
+        // unsuscribeExistingRef.apply()
         const flights = snapshot.val()
+
         console.log(flights)
         for (const flightId in flights) {
           duplicate = (flights[flightId].flightDate === flightSpecs.flightDate) && (flights[flightId].launchTime === flightSpecs.launchTime)
@@ -288,30 +319,32 @@ export default function FlightContextProvider({ children }) {
             break
           }
         }
+      })
+      unsuscribeExisting.apply()
+
+      const flightId = uuid()
+      const flightRef = ref(db, `${currentUser.uid}/flights/${flightId}`)
+      const unsubscribeNew = onValue(flightRef, () => {
         if (!duplicate) {
-          unsuscribeExistingRef.apply()
-          const flightId = uuid()
-          const flightRef = ref(db, `${currentUser.uid}/flights/${flightId}`)
-          onValue(flightRef, () => {
-            set(flightRef, flightSpecs)
-            console.log('flight saved, now lets save the igc file')
-            if (igcFileForDB) {
-              storeIgc(flightId)
-              console.log('igc file saved')
-            }
-            console.log('Flight saved!!! --> Callback here!')
-            unsuscribeExistingRef.apply()
-            resolve('UPLOADED')
-          }, (err) => {
-            console.error(err)
-            resolve(err)
-          }, false)
+          set(flightRef, flightSpecs)
+          console.log('flight saved, now lets save the igc file')
+          if (igcFileForDB) {
+            storeIgc(flightId)
+            console.log('igc file saved')
+          }
+          console.log('Flight saved!!! --> Callback here!')
+          resolve('UPLOADED')
         } else {
           console.error('Flight is duplicated in DB')
-          unsuscribeExistingRef.apply()
           resolve('DUPLICATE')
         }
-      })
+
+      }, (err) => {
+        console.error(err)
+        resolve(err)
+      }, false)
+      unsubscribeNew.apply()
+
     })
   }
 

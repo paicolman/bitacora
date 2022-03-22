@@ -30,7 +30,7 @@ export default function ForgotPassword() {
 
   return (
     <Container>
-      <AppHeader />
+      <AppHeader props={{ home: false, logoutUser: false }} />
       <div className="d-flex justify-content-center">
         <div className="pt-3 w-100" style={{ maxWidth: "400px" }}>
           <Card>

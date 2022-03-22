@@ -8,8 +8,14 @@ export default function FlightTrack() {
   const { eventBus } = useContext(FlightContext)
   const map = useMap()
   const pathOptions = { color: 'red', weight: 2 }
+  const position = [47.44722, 8.62731]
 
   useEffect(() => {
+    eventBus.on('newFile', () => {
+      setTrack(null)
+      map.panTo(position)
+    })
+
     eventBus.on('igcParsed', (igc) => {
       if (igc) {
         const trackCenter = getCenterOfBounds(igc.fixes)
@@ -24,13 +30,7 @@ export default function FlightTrack() {
         setTrack(<Polyline pathOptions={pathOptions} positions={polyline} />)
       }
     })
-
-    eventBus.on('newFile', () => {
-      setTrack(null)
-    })
   }, [])
-
-
 
   return (
     <>

@@ -6,13 +6,15 @@ import FlightTrack from './FlightTrack'
 import FlightChart from './FlightChart'
 
 export default function FlightMap() {
-  const { parseIgcFile, eventBus } = useContext(FlightContext)
+  const { eventBus } = useContext(FlightContext)
   const position = [47.44722, 8.62731]
   const [markerPos, setMarkerPos] = useState([47.44722, 8.62731])
-  const [igcObject, setIgcObject] = useState(null)
   //const map = useMap()
 
   useEffect(() => {
+    eventBus.on('newFile', () => {
+      setMarkerPos(position)
+    })
     eventBus.on('mouseOnChart', (data) => {
       if (data.activePayload) {
         const lat = data.activePayload[0].payload.latitude
@@ -21,9 +23,6 @@ export default function FlightMap() {
       }
     })
   }, [])
-
-
-
 
   return (
     <>

@@ -30,7 +30,7 @@ export default function Login() {
 
   return (
     <Container>
-      <AppHeader />
+      <AppHeader props={{ home: false, logoutUser: false }} />
       <div className="d-flex justify-content-center">
         <div className="w-100 pt-3" style={{ maxWidth: "400px" }}>
           <Card>

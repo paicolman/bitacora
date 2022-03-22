@@ -26,30 +26,33 @@ export default function PilotDashboard({ newPilot }) {
   }
 
   return (
-    <Container>
-      <AppHeader logoutUser={true} />
-      <div className='profile-container'>
-        <AuthProvider>
-          <ProfileDataProvider>
-            <ShowMainData newPilot={newPilot} />
-          </ProfileDataProvider>
-        </AuthProvider>
-        <Row>
-          <Col sm>
-            <Card className='text-center'>
-              <Card.Header><h3>Your Equipment</h3></Card.Header>
-              <Card.Title>
-                Here you can find all your gadgets and gimmicks...
-              </Card.Title>
-            </Card>
-          </Col>
-          <Col sm>
+    <>
+
+      <Container>
+        <AppHeader props={{ home: false, logoutUser: true }} />
+        <div className='profile-container'>
+          <AuthProvider>
             <ProfileDataProvider>
-              <ShowGliders />
+              <ShowMainData newPilot={newPilot} />
             </ProfileDataProvider>
-          </Col>
-        </Row>
-      </div>
-    </Container>
+          </AuthProvider>
+          <Row>
+            <Col sm>
+              <Card className='text-center'>
+                <Card.Header><h3>Your Equipment</h3></Card.Header>
+                <Card.Title>
+                  Here you can find all your gadgets and gimmicks...
+                </Card.Title>
+              </Card>
+            </Col>
+            <Col sm>
+              <ProfileDataProvider>
+                <ShowGliders />
+              </ProfileDataProvider>
+            </Col>
+          </Row>
+        </div>
+      </Container>
+    </>
   )
 }

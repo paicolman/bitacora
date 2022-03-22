@@ -60,6 +60,14 @@ export default function ShowMainData({ newPilot }) {
     window.location = '/newFlight'
   }
 
+  function handleFlightBookClick() {
+    window.location = '/book'
+  }
+
+  function handleBulkUploadClick() {
+    window.location = '/Bulk'
+  }
+
   return (
     <>
       <Card className='profile-container text-center'>
@@ -80,10 +88,10 @@ export default function ShowMainData({ newPilot }) {
                 <Button variant='primary' size='lg' style={{ maxWidth: '300px' }} onClick={handleNewFlightClick} >Log New Flight</Button>
               </Row>
               <Row className='pt-2'>
-                <Button variant='primary' size='lg' style={{ maxWidth: '300px' }}>Check Flight Book</Button>
+                <Button variant='primary' size='lg' style={{ maxWidth: '300px' }} onClick={handleFlightBookClick} >Flight Book</Button>
               </Row>
               <Row className='pt-2'>
-                <Button variant='primary' size='lg' style={{ maxWidth: '300px' }}>Bulk Upload</Button>
+                <Button variant='primary' size='lg' style={{ maxWidth: '300px' }} onClick={handleBulkUploadClick} >Bulk Upload</Button>
               </Row>
             </Col>
           </Row>

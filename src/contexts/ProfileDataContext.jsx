@@ -44,7 +44,7 @@ export function ProfileDataProvider({ children }) {
       const unsuscribe = onValue(pilotRef, (snapshot) => {
         resolve(snapshot.val())
       })
-      //unsuscribe.apply()
+      //unsuscribe.apply() //!Achtung, das sollte einkommentiert sein - effekt??
     })
     return mainDataReady
   }

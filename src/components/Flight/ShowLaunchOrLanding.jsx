@@ -1,17 +1,21 @@
-import React, { useRef, useContext } from 'react'
+import React, { useRef, useContext, useEffect } from 'react'
 import { Form, FloatingLabel } from 'react-bootstrap'
 import { getDistance } from 'geolib'
 import { FlightContext } from '../../contexts/FlightContext'
 
 export default function ShowLaunchOrLanding({ site }) {
-  const { getStartPlace, setLaunchOrLandingName } = useContext(FlightContext)
+  const { getStartOrLanding, setLaunchOrLandingName } = useContext(FlightContext)
   const lauchLandingSite = useRef()
 
-  getStartPlace(site, setName)
+  useEffect(() => {
+    getStartOrLanding(site, setName)
+  })
 
   function setName(startOrLanding) {
     if (startOrLanding) {
       lauchLandingSite.current.value = startOrLanding.name
+    } else {
+      lauchLandingSite.current.value = ''
     }
   }
 
