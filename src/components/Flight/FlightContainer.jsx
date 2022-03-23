@@ -1,9 +1,10 @@
 import React, { useEffect, useContext, useRef, useState } from 'react'
-import { Form, Col, Container, Row, Card, FloatingLabel, Toast, ToastContainer } from 'react-bootstrap'
+import { Form, Col, Container, Row, Card, FloatingLabel } from 'react-bootstrap'
 import DropzoneFlight from './DropzoneFlight'
 import FlightMap from './FlightMap'
 import { Button } from 'react-bootstrap'
 import { FlightContext } from '../../contexts/FlightContext'
+import { DbFlightContext } from '../../contexts/DbFlightContext'
 import SelectGliders from './SelectGliders'
 import PilotInfo from './PilotInfo'
 import ShowLaunchOrLanding from './ShowLaunchOrLanding'
@@ -11,10 +12,12 @@ import MaxHeight from './MaxHeight'
 import FlightDate from './FlightDate'
 import AppHeader from '../AppHeader'
 import ConfirmToast from './ConfirmToast'
+import { Navigate } from 'react-router-dom'
 
 
 export default function FlightContainer() {
   const { eventBus, discardIgc, flightSpecs, saveFlightData } = useContext(FlightContext)
+  const { dbEventBus } = useContext(DbFlightContext)
   const launchTime = useRef()
   const launchHeight = useRef()
   const landingTime = useRef()
@@ -34,6 +37,7 @@ export default function FlightContainer() {
   const [confirmToast, setConfirmToast] = useState(null)
   const [image, setImage] = useState('assets/igc_nofile.png')
   const [disabledSave, setDisabledSave] = useState(true)
+  const [goBack, setGoBack] = useState()
 
 
   useEffect(() => {
@@ -60,7 +64,8 @@ export default function FlightContainer() {
       saveDisabled(dateInfo)
     })
     return (() => {
-      eventBus.remove()
+      eventBus.remove('igcParsed', () => { console.log('removed listener for igcParsed') })
+      eventBus.remove('newDate', () => { console.log('removed listener for newDate') })
     })
   }, [])
 
@@ -151,7 +156,7 @@ export default function FlightContainer() {
   }
 
   function handleGoBack() {
-    window.location = '/'
+    setGoBack(<Navigate to="/" />)
   }
 
   function handleClearData() {
@@ -162,6 +167,7 @@ export default function FlightContainer() {
 
   return (
     <>
+      {goBack}
       <Container>
         <AppHeader props={{ home: true, logoutUser: true }} />
         <Row>
@@ -193,7 +199,7 @@ export default function FlightContainer() {
             </Row>
             <Row className='pt-2'>
               <Col sm>
-                <Button variant='secondary' size='lg' style={{ width: '100%' }} onClick={handleGoBack}>Back</Button>
+                <Button variant='secondary' size='lg' style={{ width: '100%' }} disabled={true} onClick={handleGoBack}>Back</Button>
               </Col>
               <Col sm>
                 <Button variant='danger' size='lg' style={{ width: '100%' }} onClick={handleClearData}>Clear</Button>

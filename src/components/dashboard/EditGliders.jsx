@@ -29,7 +29,8 @@ export default function EditGliders({ props }) {
       setTimeout(() => { setAlert(false) }, 5000)
     }
     if (verifyGlider) {
-      const isDefault = gliders ? gliders.length === 0 : 0
+      console.log(gliders)
+      const isDefault = gliders === null
       const newGlider = {
         id: uuid(),
         default: isDefault,
@@ -67,6 +68,7 @@ export default function EditGliders({ props }) {
   }
 
   function handleDefault(e) {
+    console.log(gliders.length)
     const defIdx = parseInt(e.target.id.split('-')[1])
     const updateGliderList = gliders.map(updateGlider => {
       updateGlider.default = false

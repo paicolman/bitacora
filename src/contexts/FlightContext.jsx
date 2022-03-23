@@ -272,6 +272,7 @@ export default function FlightContextProvider({ children }) {
   }
 
   function setSelectedGlider(gliderInfo) {
+    console.log(gliderInfo)
     flightSpecs.gliderId = gliderInfo.id
   }
 

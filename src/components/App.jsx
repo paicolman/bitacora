@@ -16,10 +16,10 @@ import DbFlightContextProvider from '../contexts/DbFlightContext';
 function App() {
   return (
     <>
-      <Navigate>
+      <Navigate basename={`${process.env.PUBLIC_URL}`}>
         <AuthProvider>
           <Routes>
-            <Route exact path="/" element={
+            <Route path="/" element={
               <>
                 <ProfileDataProvider>
                   <LoginLanding />
@@ -30,7 +30,8 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route exact path="/newflight" element={
+
+            <Route path="/newflight" element={
               <>
                 <AuthProvider>
                   <ProfileDataProvider>
@@ -41,7 +42,7 @@ function App() {
                 </AuthProvider>
               </>
             } />
-            <Route exact path="/bulk" element={
+            <Route path="/bulk" element={
               <>
                 <AuthProvider>
                   <ProfileDataProvider>
@@ -52,7 +53,7 @@ function App() {
                 </AuthProvider>
               </>
             } />
-            <Route exact path="/book" element={
+            <Route path="/book" element={
               <>
                 <AuthProvider>
                   <ProfileDataProvider>

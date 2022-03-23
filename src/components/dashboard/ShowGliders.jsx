@@ -45,7 +45,7 @@ export default function ShowGliders() {
   }
 
   function glidersList() {
-    let retVal = <Col sm>please wait...</Col>
+    let retVal = <Col sm>No wings added...</Col>
     if (dataReady && gliders) {
       retVal = gliders.map((glider, idx) => {
         return (

@@ -42,7 +42,7 @@ export default function SelectGliders() {
     getDownloadURL(storageRef, `${gliderId}/images/thumbnail`).then((url) => {
       setGliderpic(url)
     }, () => {
-      setGliderpic('/assets/nopic.jpg')
+      setGliderpic('assets/nopic.jpg')
     })
   }
 
@@ -50,7 +50,8 @@ export default function SelectGliders() {
     if (dataReady) {
       let defOption = ''
       let defaultGlider = {}
-      const options = gliders.map((glider, idx) => {
+      console.log(gliders)
+      let options = gliders?.map((glider, idx) => {
         let optionText = glider.nickname ? glider.nickname : glider.model
         optionText = `Your Glider: ${optionText}`
         const optionValue = glider.id
@@ -60,6 +61,10 @@ export default function SelectGliders() {
         }
         return <option key={`opt-${idx}`} value={optionValue} >{optionText}</option>
       })
+      console.log(options)
+      if (options === undefined) {
+        options = <option key={'opt-00'} value='no-glider' >No glider available</option>
+      }
       if ((activeGlider.model !== defaultGlider.model) && (!switched)) {
         getPicUrl(defaultGlider.id)
         setActiveGlider({
@@ -67,7 +72,18 @@ export default function SelectGliders() {
           model: defaultGlider.model,
           nickname: defaultGlider.nickname
         })
-        setSelectedGlider(defaultGlider)
+        console.log(defaultGlider ? 'exists' : 'nonexistent')
+        if (Object.keys(defaultGlider).length === 0) {
+          console.log('no gliders selected')
+          setSelectedGlider({
+            id: '',
+            type: '',
+            model: '',
+            nickname: ''
+          })
+        } else {
+          setSelectedGlider(defaultGlider)
+        }
       }
 
       return (

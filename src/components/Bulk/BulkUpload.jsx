@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect, useRef } from 'react'
-import { Button, ListGroup, Col, Modal, Form, Row, Container } from 'react-bootstrap'
+import React, { useState, useContext, useEffect } from 'react'
+import { Button, ListGroup, Modal } from 'react-bootstrap'
 import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { FlightContext } from '../../contexts/FlightContext'
 
@@ -33,12 +33,18 @@ export default function BulkUpload({ files }) {
 
   async function getDataFromDb() {
     const profileDataFromDb = await getProfileData('/profile')
-    const defaultGlider = profileDataFromDb.gliders.filter(glider => {
+    let defaultGlider = profileDataFromDb.gliders?.filter(glider => {
       return glider.default
     })
-    const defaultLicense = profileDataFromDb.licenses.filter(license => {
+    let defaultLicense = profileDataFromDb.licenses?.filter(license => {
       return license.default
     })
+    if (defaultLicense === undefined) {
+      defaultLicense = [{ id: '' }]
+    }
+    if (defaultGlider === undefined) {
+      defaultGlider = [{ id: '' }]
+    }
     flightSpecs.gliderId = defaultGlider[0].id
     flightSpecs.usedLicense = defaultLicense[0].id
     loadFiles()

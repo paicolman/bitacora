@@ -41,7 +41,8 @@ export default function ShowMainData({ newPilot }) {
 
   function onClose(dialogData) {
     let dlgData = dialogData
-    if (mainData === null) {
+    console.log(dlgData)
+    if (dialogData === null) {
       dlgData = {
         flyingSince: 'who knows?',
         pilotName: 'The Unnamed Pilot'
@@ -57,15 +58,15 @@ export default function ShowMainData({ newPilot }) {
   }
 
   function handleNewFlightClick() {
-    window.location = '/newFlight'
+    window.location = '/bitacora/newFlight'
   }
 
   function handleFlightBookClick() {
-    window.location = '/book'
+    window.location = '/bitacora/book'
   }
 
   function handleBulkUploadClick() {
-    window.location = '/Bulk'
+    window.location = '/bitacora/Bulk'
   }
 
   return (

@@ -65,7 +65,7 @@ export default function DropzoneGlider({ gliderId }) {
       getDownloadURL(storageRef, `${gliderId}/images/thumbnail`).then((url) => {
         setGliderpic(url)
       }, () => {
-        setGliderpic('/assets/dropzone_1.jpg')
+        setGliderpic('assets/dropzone_1.jpg')
       })
     }
   }
