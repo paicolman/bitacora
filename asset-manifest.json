@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/bitacora/static/css/main.ade535fc.css",
-    "main.js": "/bitacora/static/js/main.db91b1f2.js",
+    "main.js": "/bitacora/static/js/main.cab755b6.js",
     "index.html": "/bitacora/index.html",
     "main.ade535fc.css.map": "/bitacora/static/css/main.ade535fc.css.map",
-    "main.db91b1f2.js.map": "/bitacora/static/js/main.db91b1f2.js.map"
+    "main.cab755b6.js.map": "/bitacora/static/js/main.cab755b6.js.map"
   },
   "entrypoints": [
     "static/css/main.ade535fc.css",
-    "static/js/main.db91b1f2.js"
+    "static/js/main.cab755b6.js"
   ]
 }
