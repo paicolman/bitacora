@@ -4,7 +4,7 @@ import { getRhumbLineBearing, getDistance, getPathLength } from 'geolib'
 import { useAuth } from '../contexts/AuthContext'
 import app from '../firebase'
 import { getDatabase, onValue, ref, set } from 'firebase/database'
-import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage'
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
 import uuid from 'react-uuid'
 
 export const FlightContext = React.createContext()
@@ -56,6 +56,7 @@ export default function FlightContextProvider({ children }) {
     diffData,
     flightSpecs: flightSpecs,
     loadIgcFile: loadIgcFile,
+    loadIgcFromDB: loadIgcFromDB,
     discardIgc: discardIgc,
     parseIgcFile: parseIgcFile,
     setIgcFileForDB: setIgcFileForDB,
@@ -90,6 +91,27 @@ export default function FlightContextProvider({ children }) {
     if (igc) {
       igcFileForDB = igc
     }
+  }
+
+  function loadIgcFromDB(igcId) {
+    console.log('loading igc from DB...')
+    const storage = getStorage()
+    getDownloadURL(storageRef(storage, `${currentUser.uid}/igc/${igcId}`))
+      .then((igcUrl) => {
+        console.log('Got the URL...')
+        const xhr = new XMLHttpRequest()
+        xhr.responseType = 'blob'
+        xhr.headers = { 'Access-Control-Allow-Origin': '*', }
+        xhr.onload = (event) => {
+          loadIgcFile(xhr.response)
+        }
+        xhr.onerror = (response) => {
+          console.error(response)
+        }
+        console.log('Getting...')
+        xhr.open('GET', igcUrl)
+        xhr.send()
+      })
   }
 
   function parseIgcFile(igcFile) {
@@ -272,7 +294,6 @@ export default function FlightContextProvider({ children }) {
   }
 
   function setSelectedGlider(gliderInfo) {
-    console.log(gliderInfo)
     flightSpecs.gliderId = gliderInfo.id
   }
 

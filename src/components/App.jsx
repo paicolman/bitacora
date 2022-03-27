@@ -7,7 +7,7 @@ import Login from './Auth/Login';
 import ForgotPassword from './Auth/ForgotPassword';
 import { ProfileDataProvider } from '../contexts/ProfileDataContext';
 import '../css/bitacora.css'
-import NewFlight from './Flight/NewFlight';
+import FlightNavigate from './Flight/FlightNavigate';
 import FlightContextProvider from '../contexts/FlightContext';
 import BulkNavigate from './Bulk/BulkNavigate';
 import FlightBook from './Book/FlightBook';
@@ -18,53 +18,22 @@ function App() {
     <>
       <Navigate basename={`${process.env.PUBLIC_URL}`}>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={
-              <>
-                <ProfileDataProvider>
-                  <LoginLanding />
-                </ProfileDataProvider>
-              </>
-            }
-            />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-
-            <Route path="/newflight" element={
-              <>
-                <AuthProvider>
-                  <ProfileDataProvider>
-                    <FlightContextProvider>
-                      <NewFlight />
-                    </FlightContextProvider>
-                  </ProfileDataProvider>
-                </AuthProvider>
-              </>
-            } />
-            <Route path="/bulk" element={
-              <>
-                <AuthProvider>
-                  <ProfileDataProvider>
-                    <FlightContextProvider>
-                      <BulkNavigate />
-                    </FlightContextProvider>
-                  </ProfileDataProvider>
-                </AuthProvider>
-              </>
-            } />
-            <Route path="/book" element={
-              <>
-                <AuthProvider>
-                  <ProfileDataProvider>
-                    <DbFlightContextProvider>
-                      <FlightBook />
-                    </DbFlightContextProvider>
-                  </ProfileDataProvider>
-                </AuthProvider>
-              </>
-            } />
-          </Routes>
+          <ProfileDataProvider>
+            <DbFlightContextProvider>
+              <FlightContextProvider>
+                <Routes>
+                  <Route path="/" element={<LoginLanding />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/newflight" element={<FlightNavigate newFlight={true} />} />
+                  <Route path="/bulk" element={<BulkNavigate />} />
+                  <Route path="/book" element={<FlightBook />} />
+                  <Route path="/dbflight" element={<FlightNavigate newFlight={false} />} />
+                </Routes>
+              </FlightContextProvider>
+            </DbFlightContextProvider>
+          </ProfileDataProvider>
         </AuthProvider>
       </Navigate>
     </>

@@ -2,7 +2,6 @@ import React, { useEffect, useContext, useRef, useState } from 'react'
 import { Form, Col, Container, Row, Card, FloatingLabel } from 'react-bootstrap'
 import DropzoneFlight from './DropzoneFlight'
 import FlightMap from './FlightMap'
-import { Button } from 'react-bootstrap'
 import { FlightContext } from '../../contexts/FlightContext'
 import { DbFlightContext } from '../../contexts/DbFlightContext'
 import SelectGliders from './SelectGliders'
@@ -12,12 +11,13 @@ import MaxHeight from './MaxHeight'
 import FlightDate from './FlightDate'
 import AppHeader from '../AppHeader'
 import ConfirmToast from './ConfirmToast'
-import { Navigate } from 'react-router-dom'
+import FlightButtons from './FlightButtons'
+import ShowDbLaunchOrLanding from './ShowDbLaunchOrLanding'
 
-
-export default function FlightContainer() {
-  const { eventBus, discardIgc, flightSpecs, saveFlightData } = useContext(FlightContext)
-  const { dbEventBus } = useContext(DbFlightContext)
+export default function FlightContainer({ newFlight }) {
+  const { activeFlight } = useContext(DbFlightContext)
+  const { eventBus, flightSpecs, setLaunchOrLandingName, saveFlightData, loadIgcFromDB } = useContext(FlightContext)
+  //const { dbEventBus } = useContext(DbFlightContext)
   const launchTime = useRef()
   const launchHeight = useRef()
   const landingTime = useRef()
@@ -37,32 +37,55 @@ export default function FlightContainer() {
   const [confirmToast, setConfirmToast] = useState(null)
   const [image, setImage] = useState('assets/igc_nofile.png')
   const [disabledSave, setDisabledSave] = useState(true)
-  const [goBack, setGoBack] = useState()
 
 
   useEffect(() => {
     eventBus.on('igcParsed', (igc) => {
-      setImage('assets/has_igc.png')
-      clearCurrentData()
-      launchTime.current.value = flightSpecs.launch.time
-      launchHeight.current.value = flightSpecs.launch.pressureAltitude
-      landingTime.current.value = flightSpecs.landing.time
-      maxSpeedRef.current.value = flightSpecs.maxSpeed.toFixed(2)
-      maxClimbRef.current.value = flightSpecs.maxClimb.toFixed(2)
-      maxSinkRef.current.value = flightSpecs.maxSink.toFixed(2)
-      maxDistanceRef.current.value = flightSpecs.maxDist.toFixed(2)
-      pathLengthRef.current.value = flightSpecs.pathLength.toFixed(2)
-      startLandingDistRef.current.value = flightSpecs.launchLandingDist.toFixed(2)
-      setDuration(calculateDuration(flightSpecs.launch.time, flightSpecs.landing.time))
-      setFlightDate(igc.date)
-      setMaxHeight(flightSpecs.maxHeight)
-      setLaunch(flightSpecs.launch)
-      setLanding(flightSpecs.landing)
-      flightTypeRef.current.value = flightSpecs.flightType
+      if (newFlight) {
+        setImage('assets/has_igc.png')
+        clearCurrentData()
+        launchTime.current.value = flightSpecs.launch.time
+        launchHeight.current.value = flightSpecs.launch.pressureAltitude
+        landingTime.current.value = flightSpecs.landing.time
+        maxSpeedRef.current.value = flightSpecs.maxSpeed.toFixed(2)
+        maxClimbRef.current.value = flightSpecs.maxClimb.toFixed(2)
+        maxSinkRef.current.value = flightSpecs.maxSink.toFixed(2)
+        maxDistanceRef.current.value = flightSpecs.maxDist.toFixed(2)
+        pathLengthRef.current.value = flightSpecs.pathLength.toFixed(2)
+        startLandingDistRef.current.value = flightSpecs.launchLandingDist.toFixed(2)
+        setDuration(calculateDuration(flightSpecs.launch.time, flightSpecs.landing.time))
+        setFlightDate(igc.date)
+        setMaxHeight(flightSpecs.maxHeight)
+        setLaunch(flightSpecs.launch)
+        setLanding(flightSpecs.landing)
+        flightTypeRef.current.value = flightSpecs.flightType
+      }
     })
     eventBus.on('newDate', (dateInfo) => {
       saveDisabled(dateInfo)
     })
+    if (!newFlight) {
+      console.log(activeFlight)
+      launchTime.current.value = activeFlight.flightData.launch.time
+      launchHeight.current.value = activeFlight.flightData.launch.pressureAltitude
+      landingTime.current.value = activeFlight.flightData.landing.time
+      maxSpeedRef.current.value = activeFlight.flightData.maxSpeed.toFixed(2)
+      maxClimbRef.current.value = activeFlight.flightData.maxClimb.toFixed(2)
+      maxSinkRef.current.value = activeFlight.flightData.maxSink.toFixed(2)
+      maxDistanceRef.current.value = activeFlight.flightData.maxDist.toFixed(2)
+      pathLengthRef.current.value = activeFlight.flightData.pathLength.toFixed(2)
+      startLandingDistRef.current.value = activeFlight.flightData.launchLandingDist.toFixed(2)
+      flightTypeRef.current.value = activeFlight.flightData.flightType
+      flightCommentsRef.current.value = activeFlight.flightData.comments
+      setFlightDate(activeFlight.flightData.flightDate)
+      setDuration(activeFlight.flightData.duration)
+      setMaxHeight(activeFlight.flightData.maxHeight)
+      setLaunchOrLandingName({ type: 'Launch:', name: activeFlight.flightData.launchName })
+      setLaunchOrLandingName({ type: 'Landing:', name: activeFlight.flightData.landingName })
+      if (activeFlight.flightData.hasIgc) {
+        loadIgcFromDB(activeFlight.flightId)
+      }
+    }
     return (() => {
       eventBus.remove('igcParsed', () => { console.log('removed listener for igcParsed') })
       eventBus.remove('newDate', () => { console.log('removed listener for newDate') })
@@ -74,8 +97,6 @@ export default function FlightContainer() {
     const launch = launchTime?.current?.value === ''
     const landing = landingTime?.current?.value === ''
 
-    console.log(flightSpecs.flightDate, launchTime?.current, landingTime?.current)
-    console.log(dateNotReady, launch, landing)
     setDisabledSave(dateNotReady || launch || landing)
   }
 
@@ -155,19 +176,31 @@ export default function FlightContainer() {
     setConfirmToast(null)
   }
 
-  function handleGoBack() {
-    setGoBack(<Navigate to="/" />)
+  const buttonProps = {
+    handleSaveFlight: handleSaveFlight,
+    clearCurrentData: clearCurrentData,
+    setImage: setImage,
+    disabledSave: disabledSave
   }
 
-  function handleClearData() {
-    clearCurrentData()
-    discardIgc()
-    setImage('assets/igc_nofile.png')
+  function showDropzone() {
+    return newFlight ? <DropzoneFlight image={image} /> : <></>
+  }
+
+  function showLaunch() {
+    return newFlight ? <ShowLaunchOrLanding site={{ type: 'Launch:', point: launch }} />
+      : <ShowDbLaunchOrLanding site={{ type: 'Launch:', name: activeFlight.flightData.launchName }} />
+  }
+  function showLanding() {
+    return newFlight ? <ShowLaunchOrLanding site={{ type: 'Landing:', point: landing }} />
+      : <ShowDbLaunchOrLanding site={{ type: 'Landing:', name: activeFlight.flightData.landingName }} />
+  }
+  function gliderIdFromDB() {
+    return newFlight ? '' : activeFlight.flightData.gliderId
   }
 
   return (
     <>
-      {goBack}
       <Container>
         <AppHeader props={{ home: true, logoutUser: true }} />
         <Row>
@@ -187,42 +220,22 @@ export default function FlightContainer() {
           </Col>
         </Row>
         <Row className='p-3'>
-          <Col sm={4} style={{ alignSelf: 'center' }}>
-            <p>If you have an IGC file, you can drop it on the left side, or click to select it. Bitacora will analyze the file and fill in all the possible fields in the form</p>
-          </Col>
-          <Col sm={4}>
-            <DropzoneFlight image={image} />
-          </Col>
-          <Col sm={4} className='text-center' style={{ alignSelf: 'center' }}>
-            <Row className='pt-2'>
-              <Button variant='primary' size='lg' onClick={handleSaveFlight} disabled={disabledSave}>Save Flight</Button>
-            </Row>
-            <Row className='pt-2'>
-              <Col sm>
-                <Button variant='secondary' size='lg' style={{ width: '100%' }} disabled={true} onClick={handleGoBack}>Back</Button>
-              </Col>
-              <Col sm>
-                <Button variant='danger' size='lg' style={{ width: '100%' }} onClick={handleClearData}>Clear</Button>
-              </Col>
-
-            </Row>
-          </Col>
+          {showDropzone()}
+          <FlightButtons props={buttonProps} />
         </Row>
-
         <Row>
           <Col sm>
-            <SelectGliders />
+            <SelectGliders gliderIdFromDB={gliderIdFromDB()} />
           </Col>
           <Col sm>
             <Row className='p-2'>
               <Col>
-                <ShowLaunchOrLanding site={{ type: 'Launch:', point: launch }} />
+                {showLaunch()}
               </Col>
             </Row>
             <Row className='p-2'>
               <Col>
-                <ShowLaunchOrLanding site={{ type: 'Landing:', point: landing }} />
-
+                {showLanding()}
               </Col>
             </Row>
           </Col>

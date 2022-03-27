@@ -19,8 +19,6 @@ export default function PilotDashboard({ newPilot }) {
     }
   }
 
-  console.log(profileData)
-
   if (!dataReady) {
     getProfileDataFromDb()
   }

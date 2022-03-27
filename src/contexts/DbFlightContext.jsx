@@ -8,7 +8,7 @@ export const DbFlightContext = React.createContext()
 export default function DbFlightContextProvider({ children }) {
   const { currentUser } = useAuth()
   const [flights, setFlights] = useState()
-  const [flightDetails, setFlightDetails] = useState()
+  const [activeFlight, setActiveFlight] = useState()
 
   const dbEventBus = {
     on(event, callback) {
@@ -25,10 +25,10 @@ export default function DbFlightContextProvider({ children }) {
   const dbFlightContextValue = {
     dbEventBus,
     flights,
-    flightDetails,
+    activeFlight,
+    setActiveFlight: setActiveFlight,
     sortFlights: sortFlights,
-    getAllFlights: getAllFlights,
-    getFlightDetails: getFlightDetails
+    getAllFlights: getAllFlights
   }
 
   function getAllFlights() {
@@ -41,24 +41,11 @@ export default function DbFlightContextProvider({ children }) {
       const combined = flights.map((flight, idx) => {
         return { flightId: flightIds[idx], flightData: flight }
       })
-      console.log(combined)
       setFlights(combined.sort((a, b) => (a.flightData.flightDate > b.flightData.flightDate ? 1 : -1)))
     })
     // unsubscribe.apply() //! How to unsubscribe?
   }
 
-  //! This is not needed. Just set the id as "the active flight" and place an event somehow, 
-  //! navigate to FlightContainer and implement there the population of the fields...
-  function getFlightDetails(flightId) {
-    const db = getDatabase(app)
-    const flightRef = ref(db, `${currentUser.uid}/flights/${flightId}`)
-    const unsubscribe = onValue(flightRef, (snapshot) => {
-      setFlightDetails(snapshot.val())
-      console.log(snapshot.val())
-      //! Put an event dispatcher here, I guess? or trigger somehow the rendering of a flightContainer...
-    })
-    // unsubscribe.apply() //! How to unsubscribe?
-  }
 
   function sortFlights(sortBy) {
     let sorted = []

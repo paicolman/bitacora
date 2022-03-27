@@ -4,7 +4,7 @@ import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import PilotDashboard from '../dashboard/PilotDashboard'
 import FlightContainer from './FlightContainer'
 
-export default function NewFlight() {
+export default function FlightNavigate({ newFlight }) {
   const [userStatus, setUserStatus] = useState('waiting')
   const { pilotIsRegistered } = useContext(ProfileDataContext)
 
@@ -21,13 +21,13 @@ export default function NewFlight() {
         retval = <div><h4>Please wait...</h4></div>
         break
       case 'inexistent':
-        retval = <Navigate to="/login" />
+        retval = <Navigate to="/" />
         break
       case 'unregistered':
         retval = <PilotDashboard newPilot={true} />
         break
       case 'registered':
-        retval = <FlightContainer />
+        retval = <FlightContainer newFlight={newFlight} />
         break
       default:
         break

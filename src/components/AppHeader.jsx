@@ -23,7 +23,6 @@ export default function AppHeader({ props }) {
   }
 
   function setLink() {
-    console.log(props)
     let home = <></>
     let loginLogout = <></>
     if (props) {

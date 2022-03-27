@@ -4,7 +4,7 @@ import { getStorage, ref, getDownloadURL } from 'firebase/storage'
 import { Card, Row, Col, Form, Image } from 'react-bootstrap'
 import { FlightContext } from '../../contexts/FlightContext'
 
-export default function SelectGliders() {
+export default function SelectGliders({ gliderIdFromDB }) {
   const { getProfileData } = useContext(ProfileDataContext)
   const { setSelectedGlider } = useContext(FlightContext)
   const [dataReady, setDataReady] = useState(false)
@@ -28,6 +28,7 @@ export default function SelectGliders() {
   function switchGlider(e) {
 
     const selected = gliders.filter(glider => {
+      console.log(e.target.value)
       return glider.id === e.target.value
     })
     getPicUrl(selected[0].id)
@@ -50,7 +51,6 @@ export default function SelectGliders() {
     if (dataReady) {
       let defOption = ''
       let defaultGlider = {}
-      console.log(gliders)
       let options = gliders?.map((glider, idx) => {
         let optionText = glider.nickname ? glider.nickname : glider.model
         optionText = `Your Glider: ${optionText}`
@@ -59,9 +59,13 @@ export default function SelectGliders() {
           defOption = glider.id
           defaultGlider = glider
         }
+        //Overrule glider.default if there is a gliderId from the DB
+        if (glider.id === gliderIdFromDB) {
+          defOption = gliderIdFromDB
+          defaultGlider = glider
+        }
         return <option key={`opt-${idx}`} value={optionValue} >{optionText}</option>
       })
-      console.log(options)
       if (options === undefined) {
         options = <option key={'opt-00'} value='no-glider' >No glider available</option>
       }
@@ -72,7 +76,6 @@ export default function SelectGliders() {
           model: defaultGlider.model,
           nickname: defaultGlider.nickname
         })
-        console.log(defaultGlider ? 'exists' : 'nonexistent')
         if (Object.keys(defaultGlider).length === 0) {
           console.log('no gliders selected')
           setSelectedGlider({

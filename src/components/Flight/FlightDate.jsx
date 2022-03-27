@@ -17,7 +17,6 @@ export default function FlightDate({ date }) {
 
   useEffect(() => {
     setflyDate(dlgDate)
-    console.log(dlgDate)
   }, [dlgDate])
 
 

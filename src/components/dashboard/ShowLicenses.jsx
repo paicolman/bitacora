@@ -20,7 +20,6 @@ export default function ShowLicenses() {
 
   if (!dataReady) {
     getDataFromDb()
-    console.log(licenses)
   }
 
   function licenseList() {

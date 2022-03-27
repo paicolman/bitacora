@@ -78,7 +78,6 @@ export function ProfileDataProvider({ children }) {
     const dbRef = ref(db)
     let pilotRegistered = false
     const checkRegisteredPilot = new Promise((resolve) => {
-
       onValue(dbRef, (snapshot) => {
         try {
           const registeredPilots = Object.keys(snapshot.val())
