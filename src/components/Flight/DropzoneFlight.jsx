@@ -1,6 +1,6 @@
 import React, { useContext, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Card, Image, Col } from 'react-bootstrap'
+import { Card, Image, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { FlightContext } from '../../contexts/FlightContext'
 
 
@@ -19,14 +19,17 @@ export default function DropzoneFlight({ image }) {
     maxFiles: 1
   })
 
+  const renderTooltip = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      If you have an IGC file, you can drop it here, or click to select it. Bitacora will analyze the file and fill in all the possible fields in the form
+    </Tooltip>
+  )
+
   return (
     <>
-      <Col sm={4} style={{ alignSelf: 'center' }}>
-        <p>If you have an IGC file, you can drop it on the left side, or click to select it. Bitacora will analyze the file and fill in all the possible fields in the form</p>
-      </Col>
-      <Col sm={4}>
-        <Card>
-          <Card.Title className='text-center'>Drop your IGC File here</Card.Title>
+      <OverlayTrigger placement="bottom" delay={{ show: 250, hide: 400 }} overlay={renderTooltip}>
+        <Card className='mt-2 mb-2'>
+          <Card.Title className='text-center' alt='sjdhfgsjfhg'>Drop your IGC File here</Card.Title>
           <Card.Body className='text-center'>
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -36,7 +39,8 @@ export default function DropzoneFlight({ image }) {
             </div>
           </Card.Body>
         </Card>
-      </Col>
+      </OverlayTrigger>
+
     </>
   )
 }

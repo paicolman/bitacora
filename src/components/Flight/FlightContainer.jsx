@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useRef, useState } from 'react'
-import { Form, Col, Container, Row, Card, FloatingLabel } from 'react-bootstrap'
+import { Form, Col, Container, Row, Card, FloatingLabel, Image, Badge } from 'react-bootstrap'
 import DropzoneFlight from './DropzoneFlight'
 import FlightMap from './FlightMap'
 import { FlightContext } from '../../contexts/FlightContext'
@@ -13,6 +13,7 @@ import AppHeader from '../AppHeader'
 import ConfirmToast from './ConfirmToast'
 import FlightButtons from './FlightButtons'
 import ShowDbLaunchOrLanding from './ShowDbLaunchOrLanding'
+import { AuthProvider } from '../../contexts/AuthContext'
 
 export default function FlightContainer({ newFlight }) {
   const { activeFlight } = useContext(DbFlightContext)
@@ -180,11 +181,63 @@ export default function FlightContainer({ newFlight }) {
     handleSaveFlight: handleSaveFlight,
     clearCurrentData: clearCurrentData,
     setImage: setImage,
-    disabledSave: disabledSave
+    disabledSave: disabledSave,
+    newFlight: newFlight
   }
 
-  function showDropzone() {
-    return newFlight ? <DropzoneFlight image={image} /> : <></>
+  function showIgc() {
+    if (activeFlight.flightData.hasIgc) {
+      return (
+        <>
+          <Row className='igc-container'>
+            <Image className='igc-image pb-1' src='assets/has_igc.png' />
+          </Row>
+          <Row>
+            <Badge pill bg="primary" >Replace / Delete</Badge>
+          </Row>
+        </>
+      )
+    } else {
+      return (
+        <>
+          <Row className='igc-container'>
+            <Image className='igc-image pb-1' src='assets/no_igc.png' />
+          </Row>
+          <Row>
+            <Badge pill bg="primary" >Add IGC</Badge>
+          </Row>
+        </>
+      )
+    }
+  }
+
+  function showDropzoneOrIgcIcon() {
+    if (newFlight) {
+      return (
+        <>
+          <Col sm={7} className='text-center'>
+            <PilotInfo />
+          </Col>
+          <Col sm={5}>
+            <DropzoneFlight image={image} />
+          </Col>
+        </>
+      )
+    } else {
+      return (
+        <>
+          <Row className='pt-2 pb-2'>
+            <Col sm={10} className='text-center'>
+              <PilotInfo />
+            </Col>
+            <Col sm={2}>
+              {showIgc()}
+            </Col>
+          </Row>
+
+        </>
+      )
+    }
   }
 
   function showLaunch() {
@@ -204,9 +257,7 @@ export default function FlightContainer({ newFlight }) {
       <Container>
         <AppHeader props={{ home: true, logoutUser: true }} />
         <Row>
-          <Col sm className='text-center'>
-            <PilotInfo />
-          </Col>
+          {showDropzoneOrIgcIcon()}
         </Row>
         <Row className='flight-title'>
           <Col sm className='text-center'>
@@ -220,7 +271,7 @@ export default function FlightContainer({ newFlight }) {
           </Col>
         </Row>
         <Row className='p-3'>
-          {showDropzone()}
+
           <FlightButtons props={buttonProps} />
         </Row>
         <Row>

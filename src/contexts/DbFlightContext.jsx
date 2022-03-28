@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import app from '../firebase'
-import { getDatabase, onValue, ref } from 'firebase/database'
+import { getDatabase, onValue, ref, set } from 'firebase/database'
+import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage'
 
 export const DbFlightContext = React.createContext()
 
@@ -28,7 +29,9 @@ export default function DbFlightContextProvider({ children }) {
     activeFlight,
     setActiveFlight: setActiveFlight,
     sortFlights: sortFlights,
-    getAllFlights: getAllFlights
+    getAllFlights: getAllFlights,
+    deleteFlight: deleteFlight,
+    updateFlight: updateFlight
   }
 
   function getAllFlights() {
@@ -70,6 +73,48 @@ export default function DbFlightContextProvider({ children }) {
         break
     }
     setFlights([...sorted])
+  }
+
+
+  function deleteFlight() {
+    if (activeFlight) {
+      const db = getDatabase(app)
+      const flightRef = ref(db, `${currentUser.uid}/flights/${activeFlight.flightId}`)
+      const storage = getStorage()
+      const unsubscribe = onValue(flightRef, (snapshot) => { //! Unsubscribe??
+        set(flightRef, null)
+        console.log('DELETED THE DB SHIT! Call Callback here?')
+      })
+      if (activeFlight.flightData.hasIgc) {
+        const igcRef = storageRef(storage, `${currentUser.uid}/igc/${activeFlight.flightId}`)
+        deleteObject(igcRef).then(() => {
+          console.log('DELETED THE IGC! Call Callback here?')
+        }).catch((error) => {
+          console.error('DELETED GOT  SHITTY! What do do on error?')
+          console.error(error)
+        })
+      }
+    }
+  }
+
+  function updateFlight() {
+    return new Promise((resolve, reject) => {
+      if (activeFlight) {
+        const db = getDatabase(app)
+        const flightRef = ref(db, `${currentUser.uid}/flights/${activeFlight.flightId}`)
+        const unsubscribe = onValue(flightRef, () => {
+          set(flightRef, activeFlight.flightData)
+          console.log('Flight saved!!! --> Callback here!')
+          resolve('UPLOADED')
+        }, (err) => {
+          console.error(err)
+          resolve(err)
+        }, false)
+        unsubscribe.apply()
+      } else {
+        reject() //! Is this ok?
+      }
+    })
   }
 
   return (

@@ -260,7 +260,6 @@ export default function FlightContextProvider({ children }) {
         const startOrLanding = places.filter(place => {
           if (site.point) { // && !isNaN(parseFloat(place.longitude)) && isNaN(parseFloat(place.latitude))
             const dist = getDistance(place, site.point)
-            if (dist < 300) console.log(dist, place)
             return (dist < 300)
           } else {
             return null
@@ -360,13 +359,11 @@ export default function FlightContextProvider({ children }) {
           console.error('Flight is duplicated in DB')
           resolve('DUPLICATE')
         }
-
       }, (err) => {
         console.error(err)
         resolve(err)
       }, false)
       unsubscribeNew.apply()
-
     })
   }
 
