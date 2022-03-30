@@ -18,7 +18,6 @@ export default function BulkUploadDropzone() {
         file: file
       }
     })
-    console.log(fileList)
     setImage('assets/has_igc.png')
     setFiles(fileList)
   }, [])

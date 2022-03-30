@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Toast, ToastContainer, Alert } from 'react-bootstrap'
+import { Toast, ToastContainer } from 'react-bootstrap'
 
 export default function ConfirmToast({ props }) {
   const [show, setShow] = useState(true);

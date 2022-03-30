@@ -27,19 +27,16 @@ export default function ShowGliders() {
   }
 
   function handleShowDetails(e) {
-    console.log('show details')
     e.preventDefault()
     const index = parseInt(e.target.id.split('-')[1])
     const props = {
       glider: gliders[index],
       onClose: onDetailsClose
     }
-    console.log(props)
     setOpenDetailsDlg(<ShowGliderDetails props={props} />)
   }
 
   function onDetailsClose() {
-    console.log('Resetting stuff')
     setOpenDetailsDlg(null)
   }
 
@@ -74,7 +71,6 @@ export default function ShowGliders() {
   }
 
   function onClose(dialogData) {
-    console.log(dialogData)
     if (dialogData) {
       updateProfileData('/profile/gliders', dialogData.gliders, () => {
         setDataReady(false)

@@ -17,7 +17,6 @@ export default function BulkUpload({ files }) {
     getDataFromDb()
 
     return () => {
-      console.log('Clearing all stuff!')
       setUploadNames([])
       setUploadList([])
       setUploadStatus([])
@@ -27,7 +26,6 @@ export default function BulkUpload({ files }) {
 
   function handleClose() {
     setShow(false)
-    console.log(files[0])
     files[0].onClose()
   }
 
@@ -55,7 +53,6 @@ export default function BulkUpload({ files }) {
     const nameList = uploadNames.map((fileName, idx) => {
       return <ListGroup.Item key={`item-${idx}`}>Uploading {fileName}... <span className={uploadStyle[idx]}>{uploadStatus[idx]}</span></ListGroup.Item>
     })
-    // console.log(`...Listing file entries...${uploadStatus}`)
     setUploadStatus(uploadStatus)
     setUploadStyle(uploadStyle)
     setUploadNames(uploadNames)
@@ -64,7 +61,6 @@ export default function BulkUpload({ files }) {
 
   async function loadFiles() {
     for (const fileIdx in files) {
-      // console.log('... loaded file ...')
       await parseAndPopulate(files[fileIdx])
     }
   }
@@ -83,14 +79,10 @@ export default function BulkUpload({ files }) {
         parseIgcFile(file.file).then((igc) => {
           uploadStatus[uploadCount] = 'parsed'
           updateFilesList()
-          // console.log(`... parsed file ... ${uploadCount}`)
           populateFlightSpecs(igc).then(() => {
-            // console.log(`... populated flight specs ... ${uploadCount} `)
             uploadStatus[uploadCount] = 'analyzed'
             updateFilesList()
-            console.log(`>>> Storing ${file.file.name}`)
             checkAndStoreNewFlight().then((status) => {
-              console.log(status)
               finalUploadStatus(status)
               updateFilesList()
               uploadCount++

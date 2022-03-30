@@ -1,6 +1,5 @@
 import React, { useRef, useContext, useEffect } from 'react'
 import { Form, FloatingLabel } from 'react-bootstrap'
-import { getDistance } from 'geolib'
 import { FlightContext } from '../../contexts/FlightContext'
 
 export default function ShowLaunchOrLanding({ site }) {

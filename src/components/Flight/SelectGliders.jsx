@@ -3,8 +3,10 @@ import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { getStorage, ref, getDownloadURL } from 'firebase/storage'
 import { Card, Row, Col, Form, Image } from 'react-bootstrap'
 import { FlightContext } from '../../contexts/FlightContext'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function SelectGliders({ gliderIdFromDB }) {
+  const { currentUser } = useAuth()
   const { getProfileData } = useContext(ProfileDataContext)
   const { setSelectedGlider } = useContext(FlightContext)
   const [dataReady, setDataReady] = useState(false)
@@ -28,7 +30,6 @@ export default function SelectGliders({ gliderIdFromDB }) {
   function switchGlider(e) {
 
     const selected = gliders.filter(glider => {
-      console.log(e.target.value)
       return glider.id === e.target.value
     })
     getPicUrl(selected[0].id)
@@ -39,8 +40,8 @@ export default function SelectGliders({ gliderIdFromDB }) {
 
   function getPicUrl(gliderId) {
     const storage = getStorage()
-    const storageRef = ref(storage, `${gliderId}/images/thumbnail`)
-    getDownloadURL(storageRef, `${gliderId}/images/thumbnail`).then((url) => {
+    const storageRef = ref(storage, `${currentUser.uid}/images/${gliderId}/thumbnail`)
+    getDownloadURL(storageRef, `${currentUser.uid}/images/${gliderId}/thumbnail`).then((url) => {
       setGliderpic(url)
     }, () => {
       setGliderpic('assets/nopic.jpg')
@@ -77,7 +78,6 @@ export default function SelectGliders({ gliderIdFromDB }) {
           nickname: defaultGlider.nickname
         })
         if (Object.keys(defaultGlider).length === 0) {
-          console.log('no gliders selected')
           setSelectedGlider({
             id: '',
             type: '',

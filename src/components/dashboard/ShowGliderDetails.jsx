@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
 import { Button, Card, Col, Modal, Form, Row, Container, Image } from 'react-bootstrap'
 import { getStorage, ref, getDownloadURL } from 'firebase/storage'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function ShowGliderDetails({ props }) {
+  const { currentUser } = useAuth()
   const [show, setShow] = useState(true)
   const [gliderpic, setGliderpic] = useState(null)
 
   const gliderName = props.glider.nickname ? `${props.glider.nickname}` : `${props.glider.model}`
 
   function handleClose() {
-    console.log(props)
     setShow(false)
     props.onClose()
   }
@@ -19,10 +20,8 @@ export default function ShowGliderDetails({ props }) {
   function getPicUrl() {
     if (!gliderpic) {
       const storage = getStorage()
-      console.log(props.glider.id)
-      const storageRef = ref(storage, `${props.glider.id}/images/gliderpic`)
-      getDownloadURL(storageRef, `${props.glider.id}/images/gliderpic`).then((url) => {
-        console.log(url)
+      const storageRef = ref(storage, `${currentUser.uid}/images/${props.glider.id}/gliderpic`)
+      getDownloadURL(storageRef, `${currentUser.uid}/images/${props.glider.id}/gliderpic`).then((url) => {
         setGliderpic(url)
       }, () => {
         setGliderpic('/assets/nopic.jpg')

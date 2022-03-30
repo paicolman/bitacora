@@ -33,7 +33,7 @@ export function ProfileDataProvider({ children }) {
     const unsuscribe = onValue(pilotRef, (snapshot) => {
       set(pilotRef, dataToWrite)
       callback()
-    }, (err) => { console.log(err) }, false)
+    }, (err) => { console.error(err) }, false)
     unsuscribe.apply() // To prevent repeated writing on changes
   }
 
@@ -107,8 +107,6 @@ export function ProfileDataProvider({ children }) {
     const dbRef = ref(db)
 
     onValue(dbRef, (snapshot) => {
-      //const registeredPilots = Object.keys(snapshot.val())
-      const pilotExist = true
       if (!preventFlood) {
         const newPilotRef = child(dbRef, `${currentUser.uid}`)
         set(newPilotRef, {

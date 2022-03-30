@@ -29,8 +29,8 @@ export default function FlightContextProvider({ children }) {
     maxDist: 0,
     pathLength: 0,
     launchLandingDist: 0,
-    duration: 'Duration: --:--:--',
-    flightDate: 'Date: ....-..-..',
+    duration: '00:00:00',
+    flightDate: 'yyyy-mm-dd',
     maxHeight: 0,
     launchName: '',
     landingName: '',
@@ -78,8 +78,8 @@ export default function FlightContextProvider({ children }) {
         eventBus.dispatch('igcParsed', igc)
       }
     }).catch(e => {
-      console.log('Error parsing')
-      console.log(e)
+      console.error('Error parsing IGC File')
+      console.error(e)
     })
   }
 
@@ -94,11 +94,9 @@ export default function FlightContextProvider({ children }) {
   }
 
   function loadIgcFromDB(igcId) {
-    console.log('loading igc from DB...')
     const storage = getStorage()
     getDownloadURL(storageRef(storage, `${currentUser.uid}/igc/${igcId}`))
       .then((igcUrl) => {
-        console.log('Got the URL...')
         const xhr = new XMLHttpRequest()
         xhr.responseType = 'blob'
         xhr.headers = { 'Access-Control-Allow-Origin': '*', }
@@ -108,7 +106,6 @@ export default function FlightContextProvider({ children }) {
         xhr.onerror = (response) => {
           console.error(response)
         }
-        console.log('Getting...')
         xhr.open('GET', igcUrl)
         xhr.send()
       })
@@ -300,7 +297,7 @@ export default function FlightContextProvider({ children }) {
     flightSpecs.usedLicense = licenseInfo
   }
 
-  function saveFlightData(dataToSave) {
+  function saveFlightData(dataToSave, existingFlightId) {
     flightSpecs.duration = dataToSave.duration
     flightSpecs.flightType = dataToSave.flightType
     flightSpecs.landingTime = dataToSave.landingTime
@@ -313,7 +310,11 @@ export default function FlightContextProvider({ children }) {
     flightSpecs.maxSpeed = isNaN(dataToSave.maxSpeed) ? 0 : dataToSave.maxSpeed
     flightSpecs.pathLength = isNaN(dataToSave.pathLength) ? 0 : dataToSave.pathLength
     flightSpecs.comments = dataToSave.comments
-    return checkAndStoreNewFlight()
+    if (existingFlightId) {
+      return updateFlight(existingFlightId)
+    } else {
+      return checkAndStoreNewFlight()
+    }
   }
 
   function storeIgc(uniqueId) {
@@ -332,11 +333,11 @@ export default function FlightContextProvider({ children }) {
         // unsuscribeExistingRef.apply()
         const flights = snapshot.val()
 
-        console.log(flights)
         for (const flightId in flights) {
           duplicate = (flights[flightId].flightDate === flightSpecs.flightDate) && (flights[flightId].launchTime === flightSpecs.launchTime)
           if (duplicate) {
-            console.log(flights[flightId].flightDate, flightSpecs.flightDate, flights[flightId].launchTime, flightSpecs.launchTime)
+            console.warn('Duplicate flight')
+            console.warn(flights[flightId].flightDate, flightSpecs.flightDate, flights[flightId].launchTime, flightSpecs.launchTime)
             break
           }
         }
@@ -348,15 +349,12 @@ export default function FlightContextProvider({ children }) {
       const unsubscribeNew = onValue(flightRef, () => {
         if (!duplicate) {
           set(flightRef, flightSpecs)
-          console.log('flight saved, now lets save the igc file')
           if (igcFileForDB) {
             storeIgc(flightId)
-            console.log('igc file saved')
           }
-          console.log('Flight saved!!! --> Callback here!')
           resolve('UPLOADED')
         } else {
-          console.error('Flight is duplicated in DB')
+          console.warn('Flight is duplicated in DB')
           resolve('DUPLICATE')
         }
       }, (err) => {
@@ -366,6 +364,22 @@ export default function FlightContextProvider({ children }) {
       unsubscribeNew.apply()
     })
   }
+
+  function updateFlight(flightId) {
+    return new Promise((resolve, reject) => {
+      const db = getDatabase(app)
+      const flightRef = ref(db, `${currentUser.uid}/flights/${flightId}`)
+      const unsubscribe = onValue(flightRef, () => {
+        set(flightRef, flightSpecs)
+        resolve('UPLOADED')
+      }, (err) => {
+        console.error(err)
+        resolve(err)
+      }, false)
+      unsubscribe.apply()
+    })
+  }
+
 
   return (
     <FlightContext.Provider value={flightContextValue}>

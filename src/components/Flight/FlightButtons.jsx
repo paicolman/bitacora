@@ -6,7 +6,7 @@ import { DbFlightContext } from '../../contexts/DbFlightContext'
 
 export default function FlightButtons({ props }) {
   const { discardIgc } = useContext(FlightContext)
-  const { deleteFlight, updateFlight } = useContext(DbFlightContext)
+  const { getPreviousFlight, getNextFlight } = useContext(DbFlightContext)
   const [goBack, setGoBack] = useState()
 
 
@@ -25,15 +25,17 @@ export default function FlightButtons({ props }) {
   }
 
   function handleDelete() {
-    deleteFlight() //! This should not be called directly, but through a confirmation dialog!!
+    props.handleDelete()
   }
 
-  function handleUpdate() {
-    updateFlight()
+  function handleGetPrevious() {
+    getPreviousFlight()
+  }
+  function handleGetNext() {
+    getNextFlight()
   }
 
   function renderButtons() {
-    console.log(props)
     if (props.newFlight) {
       return (
         <>
@@ -58,10 +60,10 @@ export default function FlightButtons({ props }) {
           <Col sm className='text-center' style={{ alignSelf: 'center' }}>
             <Row className='pt-2'>
               <Col sm>
-                <Button variant='secondary' size='lg' style={{ width: '100%' }} onClick={handleGoBack}>Prev</Button>
+                <Button variant='secondary' size='lg' style={{ width: '100%' }} onClick={handleGetPrevious}>Prev</Button>
               </Col>
               <Col sm>
-                <Button variant='primary' size='lg' onClick={handleUpdate}>Update Flight</Button>
+                <Button variant='primary' size='lg' style={{ width: '100%' }} onClick={props.handleUpdateFlight}>Update Flight</Button>
               </Col>
               <Col sm>
                 <Button variant='info' size='lg' style={{ width: '100%' }} onClick={handleGoBook}>Flight Book</Button>
@@ -70,7 +72,7 @@ export default function FlightButtons({ props }) {
                 <Button variant='danger' size='lg' style={{ width: '100%' }} onClick={handleDelete}>Delete Flight</Button>
               </Col>
               <Col sm>
-                <Button variant='secondary' size='lg' style={{ width: '100%' }} onClick={handleGoBack}>Next</Button>
+                <Button variant='secondary' size='lg' style={{ width: '100%' }} onClick={handleGetNext}>Next</Button>
               </Col>
             </Row>
           </Col>

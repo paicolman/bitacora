@@ -1,4 +1,5 @@
 import React, { useEffect, useContext, useRef, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { Form, Col, Container, Row, Card, FloatingLabel, Image, Badge } from 'react-bootstrap'
 import DropzoneFlight from './DropzoneFlight'
 import FlightMap from './FlightMap'
@@ -13,12 +14,12 @@ import AppHeader from '../AppHeader'
 import ConfirmToast from './ConfirmToast'
 import FlightButtons from './FlightButtons'
 import ShowDbLaunchOrLanding from './ShowDbLaunchOrLanding'
-import { AuthProvider } from '../../contexts/AuthContext'
+import ConfirmationDialog from './ConfirmationDialog'
 
 export default function FlightContainer({ newFlight }) {
-  const { activeFlight } = useContext(DbFlightContext)
+  const { activeFlight, deleteFlight, getNextFlight, getFirstFlight } = useContext(DbFlightContext)
   const { eventBus, flightSpecs, setLaunchOrLandingName, saveFlightData, loadIgcFromDB } = useContext(FlightContext)
-  //const { dbEventBus } = useContext(DbFlightContext)
+  const { dbEventBus } = useContext(DbFlightContext)
   const launchTime = useRef()
   const launchHeight = useRef()
   const landingTime = useRef()
@@ -38,7 +39,7 @@ export default function FlightContainer({ newFlight }) {
   const [confirmToast, setConfirmToast] = useState(null)
   const [image, setImage] = useState('assets/igc_nofile.png')
   const [disabledSave, setDisabledSave] = useState(true)
-
+  const [showConfirmDlg, setShowConfirmDlg] = useState()
 
   useEffect(() => {
     eventBus.on('igcParsed', (igc) => {
@@ -65,8 +66,7 @@ export default function FlightContainer({ newFlight }) {
     eventBus.on('newDate', (dateInfo) => {
       saveDisabled(dateInfo)
     })
-    if (!newFlight) {
-      console.log(activeFlight)
+    if (!newFlight && activeFlight) {
       launchTime.current.value = activeFlight.flightData.launch.time
       launchHeight.current.value = activeFlight.flightData.launch.pressureAltitude
       landingTime.current.value = activeFlight.flightData.landing.time
@@ -87,9 +87,31 @@ export default function FlightContainer({ newFlight }) {
         loadIgcFromDB(activeFlight.flightId)
       }
     }
+    dbEventBus.on('switchActiveFlight', (switchedFlight) => {
+      launchTime.current.value = switchedFlight.flightData.launch.time
+      launchHeight.current.value = switchedFlight.flightData.launch.pressureAltitude
+      landingTime.current.value = switchedFlight.flightData.landing.time
+      maxSpeedRef.current.value = switchedFlight.flightData.maxSpeed.toFixed(2)
+      maxClimbRef.current.value = switchedFlight.flightData.maxClimb.toFixed(2)
+      maxSinkRef.current.value = switchedFlight.flightData.maxSink.toFixed(2)
+      maxDistanceRef.current.value = switchedFlight.flightData.maxDist.toFixed(2)
+      pathLengthRef.current.value = switchedFlight.flightData.pathLength.toFixed(2)
+      startLandingDistRef.current.value = switchedFlight.flightData.launchLandingDist.toFixed(2)
+      flightTypeRef.current.value = switchedFlight.flightData.flightType
+      flightCommentsRef.current.value = switchedFlight.flightData.comments
+      setFlightDate(switchedFlight.flightData.flightDate)
+      setDuration(switchedFlight.flightData.duration)
+      setMaxHeight(switchedFlight.flightData.maxHeight)
+      setLaunchOrLandingName({ type: 'Launch:', name: switchedFlight.flightData.launchName })
+      setLaunchOrLandingName({ type: 'Landing:', name: switchedFlight.flightData.landingName })
+      if (switchedFlight.flightData.hasIgc) {
+        loadIgcFromDB(switchedFlight.flightId)
+      }
+    })
     return (() => {
       eventBus.remove('igcParsed', () => { console.log('removed listener for igcParsed') })
       eventBus.remove('newDate', () => { console.log('removed listener for newDate') })
+      dbEventBus.remove('switchActiveFlight', () => { console.log('removed listener for switchActiveFlight') })
     })
   }, [])
 
@@ -138,25 +160,6 @@ export default function FlightContainer({ newFlight }) {
     saveDisabled(flightDate)
   }
 
-  async function handleSaveFlight() {
-    const dataToSave = {
-      launchTime: launchTime.current.value,
-      landingTime: landingTime.current.value,
-      duration: duration,
-      launchHeight: parseInt(launchHeight.current.value),
-      flightType: flightTypeRef.current.value,
-      maxSpeed: parseFloat(maxSpeedRef.current.value),
-      maxClimb: parseFloat(maxClimbRef.current.value),
-      maxSink: parseFloat(maxSinkRef.current.value),
-      maxDist: parseFloat(maxDistanceRef.current.value),
-      launchlandDist: parseFloat(startLandingDistRef.current.value),
-      pathLength: parseFloat(pathLengthRef.current.value),
-      comments: flightCommentsRef.current.value
-    }
-    const response = await saveFlightData(dataToSave)
-    showMessage(response)
-  }
-
   function showMessage(response) {
     let confirm = <></>
     switch (response) {
@@ -179,14 +182,16 @@ export default function FlightContainer({ newFlight }) {
 
   const buttonProps = {
     handleSaveFlight: handleSaveFlight,
+    handleUpdateFlight: handleUpdateFlight,
     clearCurrentData: clearCurrentData,
     setImage: setImage,
     disabledSave: disabledSave,
-    newFlight: newFlight
+    newFlight: newFlight,
+    handleDelete: handleDelete
   }
 
   function showIgc() {
-    if (activeFlight.flightData.hasIgc) {
+    if (activeFlight?.flightData?.hasIgc) {
       return (
         <>
           <Row className='igc-container'>
@@ -240,21 +245,82 @@ export default function FlightContainer({ newFlight }) {
     }
   }
 
+  function handleUpdateFlight() {
+    const props = {
+      show: true,
+      title: `Update Flight from ${activeFlight.flightData.flightDate}`,
+      text: `Are you sure you want to update the flight from ${activeFlight.flightData.flightDate} with the actual data?`,
+      action: 'Update this flight',
+      confirm: handleSaveFlight
+    }
+    setShowConfirmDlg(<ConfirmationDialog props={props} />)
+  }
+
+  async function handleSaveFlight() {
+    setShowConfirmDlg(null)
+    const dataToSave = {
+      launchTime: launchTime.current.value,
+      landingTime: landingTime.current.value,
+      duration: duration,
+      launchHeight: parseInt(launchHeight.current.value),
+      flightType: flightTypeRef.current.value,
+      maxSpeed: parseFloat(maxSpeedRef.current.value),
+      maxClimb: parseFloat(maxClimbRef.current.value),
+      maxSink: parseFloat(maxSinkRef.current.value),
+      maxDist: parseFloat(maxDistanceRef.current.value),
+      launchlandDist: parseFloat(startLandingDistRef.current.value),
+      pathLength: parseFloat(pathLengthRef.current.value),
+      comments: flightCommentsRef.current.value
+    }
+    //sync flight dates first...
+    if (!newFlight) {
+      flightSpecs.flightDate = activeFlight.flightData.flightDate
+    }
+    const flightId = activeFlight?.flightId
+    const response = await saveFlightData(dataToSave, flightId)
+    showMessage(response)
+  }
+
+  function handleDelete() {
+    const props = {
+      show: true,
+      title: `Delete Flight from ${activeFlight.flightData.flightDate}`,
+      text: `Are you sure you want to delete the flight from ${activeFlight.flightData.flightDate}? This flight will be removed from your flight log!`,
+      action: 'Delete this flight',
+      confirm: deleteFlightFromDb
+    }
+    setShowConfirmDlg(<ConfirmationDialog props={props} />)
+  }
+
+  async function deleteFlightFromDb(confirm) {
+    setShowConfirmDlg(null)
+    if (confirm) {
+      await deleteFlight()
+      if (!getNextFlight()) {
+        if (!getFirstFlight()) {
+          setShowConfirmDlg(<Navigate to='/' />)
+        }
+      }
+    }
+  }
+
   function showLaunch() {
     return newFlight ? <ShowLaunchOrLanding site={{ type: 'Launch:', point: launch }} />
-      : <ShowDbLaunchOrLanding site={{ type: 'Launch:', name: activeFlight.flightData.launchName }} />
+      : <ShowDbLaunchOrLanding site={{ type: 'Launch:', name: activeFlight?.flightData?.launchName }} />
   }
+
   function showLanding() {
     return newFlight ? <ShowLaunchOrLanding site={{ type: 'Landing:', point: landing }} />
-      : <ShowDbLaunchOrLanding site={{ type: 'Landing:', name: activeFlight.flightData.landingName }} />
+      : <ShowDbLaunchOrLanding site={{ type: 'Landing:', name: activeFlight?.flightData?.landingName }} />
   }
   function gliderIdFromDB() {
-    return newFlight ? '' : activeFlight.flightData.gliderId
+    return newFlight ? '' : activeFlight?.flightData?.gliderId
   }
 
   return (
     <>
       <Container>
+        {showConfirmDlg}
         <AppHeader props={{ home: true, logoutUser: true }} />
         <Row>
           {showDropzoneOrIgcIcon()}

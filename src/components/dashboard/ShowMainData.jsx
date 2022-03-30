@@ -31,7 +31,6 @@ export default function ShowMainData({ newPilot }) {
   }
 
   function handleOpenDlg() {
-    console.log('Rendering dialog')
     const props = {
       data: mainData,
       onClose: onClose
@@ -41,7 +40,6 @@ export default function ShowMainData({ newPilot }) {
 
   function onClose(dialogData) {
     let dlgData = dialogData
-    console.log(dlgData)
     if (dialogData === null) {
       dlgData = {
         flyingSince: 'who knows?',
@@ -49,7 +47,6 @@ export default function ShowMainData({ newPilot }) {
       }
     }
     if (dlgData) {
-      console.log(dialogData)
       updateProfileData('/profile/mainData', dlgData, () => {
         setDataReady(false)
       })
@@ -85,12 +82,13 @@ export default function ShowMainData({ newPilot }) {
               <ShowLicenses />
             </Col>
             <Col sm={4} className='text-end'>
-              <Row className='pt-2 text-right'>
-                <Button variant='primary' size='lg' style={{ maxWidth: '300px' }} onClick={handleNewFlightClick} >Log New Flight</Button>
-              </Row>
               <Row className='pt-2'>
                 <Button variant='primary' size='lg' style={{ maxWidth: '300px' }} onClick={handleFlightBookClick} >Flight Book</Button>
               </Row>
+              <Row className='pt-2 text-right'>
+                <Button variant='info' size='lg' style={{ maxWidth: '300px' }} onClick={handleNewFlightClick} >Log New Flight</Button>
+              </Row>
+
               <Row className='pt-2'>
                 <Button variant='primary' size='lg' style={{ maxWidth: '300px' }} onClick={handleBulkUploadClick} >Bulk Upload</Button>
               </Row>

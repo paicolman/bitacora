@@ -20,7 +20,6 @@ export default function FlightTrack() {
       if (igc) {
         const trackCenter = getCenterOfBounds(igc.fixes)
         const bounds = getBounds(igc.fixes)
-        // console.log([bounds.minLat, bounds.minLng], [bounds.maxLat, bounds.maxLng])
         map.panTo([trackCenter.latitude, trackCenter.longitude])
         map.fitBounds([[bounds.maxLat, bounds.maxLng], [bounds.minLat, bounds.minLng]])
         const polyline = igc.fixes.map(fix => {

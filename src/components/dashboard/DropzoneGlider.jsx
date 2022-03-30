@@ -4,9 +4,11 @@ import { useDropzone } from 'react-dropzone'
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import Resizer from 'react-image-file-resizer'
+import { useAuth } from '../../contexts/AuthContext'
 
 
 export default function DropzoneGlider({ gliderId }) {
+  const { currentUser } = useAuth()
   const [gliderpic, setGliderpic] = useState(null)
 
   function resizeFile(file, maxX, maxY) {
@@ -39,9 +41,9 @@ export default function DropzoneGlider({ gliderId }) {
         const gliderPic = dataURIToBlob(gliderPicBytes)
 
         const storage = getStorage()
-        const thumbRef = ref(storage, `${gliderId}/images/thumbnail`)
+        const thumbRef = ref(storage, `${currentUser.uid}/images/${gliderId}/thumbnail`)
         uploadBytes(thumbRef, thumbnail).then((snapshot) => {
-          const picRef = ref(storage, `${gliderId}/images/gliderpic`)
+          const picRef = ref(storage, `${currentUser.uid}/images/${gliderId}/gliderpic`)
           uploadBytes(picRef, gliderPic).then((snapshot) => {
             setGliderpic(null)
           })
@@ -61,8 +63,8 @@ export default function DropzoneGlider({ gliderId }) {
   function getPicUrl() {
     if (!gliderpic) {
       const storage = getStorage()
-      const storageRef = ref(storage, `${gliderId}/images/thumbnail`)
-      getDownloadURL(storageRef, `${gliderId}/images/thumbnail`).then((url) => {
+      const storageRef = ref(storage, `${currentUser.uid}/images/${gliderId}/thumbnail`)
+      getDownloadURL(storageRef, `${currentUser.uid}/images/${gliderId}/thumbnail`).then((url) => {
         setGliderpic(url)
       }, () => {
         setGliderpic('assets/dropzone_1.jpg')

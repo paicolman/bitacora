@@ -27,7 +27,7 @@ export default function Signup() {
       history("/")
     } catch (e) {
       setError("Failed to create an account")
-      console.log(e)
+      console.error(e)
     }
 
     setLoading(false)

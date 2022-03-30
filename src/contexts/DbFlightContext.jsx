@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import app from '../firebase'
 import { getDatabase, onValue, ref, set } from 'firebase/database'
@@ -10,6 +10,10 @@ export default function DbFlightContextProvider({ children }) {
   const { currentUser } = useAuth()
   const [flights, setFlights] = useState()
   const [activeFlight, setActiveFlight] = useState()
+
+  useEffect(() => {
+    dbEventBus.dispatch('switchActiveFlight', activeFlight)
+  }, [activeFlight])
 
   const dbEventBus = {
     on(event, callback) {
@@ -31,7 +35,9 @@ export default function DbFlightContextProvider({ children }) {
     sortFlights: sortFlights,
     getAllFlights: getAllFlights,
     deleteFlight: deleteFlight,
-    updateFlight: updateFlight
+    getFirstFlight: getFirstFlight,
+    getNextFlight: getNextFlight,
+    getPreviousFlight: getPreviousFlight
   }
 
   function getAllFlights() {
@@ -75,46 +81,70 @@ export default function DbFlightContextProvider({ children }) {
     setFlights([...sorted])
   }
 
-
-  function deleteFlight() {
-    if (activeFlight) {
-      const db = getDatabase(app)
-      const flightRef = ref(db, `${currentUser.uid}/flights/${activeFlight.flightId}`)
-      const storage = getStorage()
-      const unsubscribe = onValue(flightRef, (snapshot) => { //! Unsubscribe??
-        set(flightRef, null)
-        console.log('DELETED THE DB SHIT! Call Callback here?')
-      })
-      if (activeFlight.flightData.hasIgc) {
-        const igcRef = storageRef(storage, `${currentUser.uid}/igc/${activeFlight.flightId}`)
-        deleteObject(igcRef).then(() => {
-          console.log('DELETED THE IGC! Call Callback here?')
-        }).catch((error) => {
-          console.error('DELETED GOT  SHITTY! What do do on error?')
-          console.error(error)
-        })
+  function getNextFlight() {
+    if (flights.length > 0) {
+      const flightIndex = flights.findIndex(flight => flight.flightId === activeFlight.flightId)
+      if (flightIndex < flights.length - 1) {
+        setActiveFlight(flights[flightIndex + 1])
+        return true
       }
+      console.warn('No NEXT flight!')
+      return false
+    } else {
+      console.warn('No flights, array empty!')
+      return false
+    }
+  }
+  function getPreviousFlight() {
+    if (flights.length > 0) {
+      const flightIndex = flights.findIndex(flight => flight.flightId === activeFlight.flightId)
+      if (flightIndex > 0) {
+        setActiveFlight(flights[flightIndex - 1])
+        return true
+      }
+      console.warn('No PREV flight!')
+      return false
+    } else {
+      console.warn('No flights, array empty!')
+      return false
     }
   }
 
-  function updateFlight() {
-    return new Promise((resolve, reject) => {
-      if (activeFlight) {
+  function getFirstFlight() {
+    if (flights.length > 0) {
+      setActiveFlight(flights[0])
+      return true
+    } else {
+      console.warn('No flights, array empty!')
+      return false
+    }
+  }
+
+
+  function deleteFlight() {
+    if (activeFlight) {
+      return new Promise((resolve, reject) => {
+        const flightIndex = flights.findIndex(flight => flight.flightId === activeFlight.flightId)
+        flights.splice(flightIndex, 1)
         const db = getDatabase(app)
         const flightRef = ref(db, `${currentUser.uid}/flights/${activeFlight.flightId}`)
-        const unsubscribe = onValue(flightRef, () => {
-          set(flightRef, activeFlight.flightData)
-          console.log('Flight saved!!! --> Callback here!')
-          resolve('UPLOADED')
-        }, (err) => {
-          console.error(err)
-          resolve(err)
-        }, false)
-        unsubscribe.apply()
-      } else {
-        reject() //! Is this ok?
-      }
-    })
+        const storage = getStorage()
+        const unsubscribe = onValue(flightRef, (snapshot) => { //! Unsubscribe??
+          set(flightRef, null)
+          resolve()
+        })
+        if (activeFlight.flightData.hasIgc) {
+          const igcRef = storageRef(storage, `${currentUser.uid}/igc/${activeFlight.flightId}`)
+          deleteObject(igcRef).then(() => {
+            resolve()
+          }).catch((error) => {
+            console.error(error)
+            reject()
+          })
+        }
+      })
+
+    }
   }
 
   return (

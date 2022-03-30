@@ -7,7 +7,6 @@ export default function EditLicenses({ props }) {
   const licensesInputRef = useRef()
 
   function handleAddLicence(e) {
-    console.log('Adding license')
     e.preventDefault()
     const newLicenseId = licensesInputRef.current.value
     const isDefault = licenses == null ? true : (licenses?.length === 0)

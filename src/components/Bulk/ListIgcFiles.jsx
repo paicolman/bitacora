@@ -7,7 +7,6 @@ export default function ListIgcFiles({ files }) {
   const [displayFiles, setDisplayFiles] = useState('No Files available yet...')
   const [openDlg, setOpenDlg] = useState(null)
   const uploadButton = useRef()
-  let disabled = true
 
   useEffect(() => {
     listFiles()
@@ -38,14 +37,12 @@ export default function ListIgcFiles({ files }) {
         return file.import
       })
     }
-    disabled = !anySelected
     if (uploadButton) {
       uploadButton.current.disabled = !anySelected
     }
-
   }
+
   function handleOpenDlg() {
-    console.log('UPLOAD dammit')
     setOpenDlg(<BulkUpload files={files} />)
   }
 

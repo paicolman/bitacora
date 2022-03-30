@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { ProfileDataContext } from '../../contexts/ProfileDataContext'
-import { Badge, Card, ListGroup } from 'react-bootstrap'
+import { Badge, ListGroup } from 'react-bootstrap'
 import EditLicenses from './EditLicenses'
 
 export default function ShowLicenses() {
@@ -43,7 +43,6 @@ export default function ShowLicenses() {
   }
 
   function onClose(dialogData) {
-    console.log(dialogData)
     if (dialogData) {
       updateProfileData('/profile/licenses', dialogData.licenses, () => {
         setDataReady(false)
