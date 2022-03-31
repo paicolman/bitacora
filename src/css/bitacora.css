@@ -1,5 +1,5 @@
 div#root {
-  background-color: aliceblue;
+  
 }
 
 .glider-table-header {
@@ -49,8 +49,10 @@ div#root {
   background-color: #f8f9fa;
 }
 .app-header {
-  height: 100px;
-  background-color: #a7bbec;
+  background-color:lightblue;
+}
+.app-logo{
+  max-height: 60px;
 }
 .glider-list {
   width: 40% !important;

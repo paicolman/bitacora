@@ -86,11 +86,11 @@ export default function ShowMainData({ newPilot }) {
                 <Button variant='primary' size='lg' style={{ maxWidth: '300px' }} onClick={handleFlightBookClick} >Flight Book</Button>
               </Row>
               <Row className='pt-2 text-right'>
-                <Button variant='info' size='lg' style={{ maxWidth: '300px' }} onClick={handleNewFlightClick} >Log New Flight</Button>
+                <Button variant='secondary' size='lg' style={{ maxWidth: '300px' }} onClick={handleNewFlightClick} >Log New Flight</Button>
               </Row>
 
               <Row className='pt-2'>
-                <Button variant='primary' size='lg' style={{ maxWidth: '300px' }} onClick={handleBulkUploadClick} >Bulk Upload</Button>
+                <Button variant='info' size='lg' style={{ maxWidth: '300px' }} onClick={handleBulkUploadClick} >Bulk Upload</Button>
               </Row>
             </Col>
           </Row>

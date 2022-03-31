@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from "react-router-dom"
-import { Navbar, Container } from 'react-bootstrap'
+import { Navbar, Container, Image } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import { Navigate } from 'react-router-dom'
 
@@ -46,7 +46,7 @@ export default function AppHeader({ props }) {
       {goBack}
       <Navbar className='app-header sticky-top'>
         <Container>
-          <Navbar.Brand><h1>BITACORA</h1></Navbar.Brand>
+          <Navbar.Brand><Image src='assets/bitacora_logo.png' className='app-logo' /></Navbar.Brand>
           <Navbar.Toggle />
           <Navbar.Collapse className="justify-content-end">
             <Navbar.Text>
