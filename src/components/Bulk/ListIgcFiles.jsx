@@ -73,9 +73,9 @@ export default function ListIgcFiles({ files }) {
     })
     const retVal = (
       <>
-        <p>We found the following IGC files available for upload. Please select the ones you want to upload and press the "upload" button down below.</p>
+        <p>We found the following IGC files available for upload. Please select the ones you want to upload and press the 'upload' button down below.</p>
         <div className='d-flex justify-content-center'>
-          <div className="pt-3 w-100" style={{ maxWidth: "800px" }}>
+          <div className='pt-3 w-100' style={{ maxWidth: '800px' }}>
             <ListGroup>
               <ListGroup.Item key={`header-item`}>
                 <Row>

@@ -1,14 +1,14 @@
-import React, { useRef, useState } from "react"
-import { Container, Form, Button, Card, Alert } from "react-bootstrap"
-import { useAuth } from "../../contexts/AuthContext"
-import { Link } from "react-router-dom"
+import React, { useRef, useState } from 'react'
+import { Container, Form, Button, Card, Alert } from 'react-bootstrap'
+import { useAuth } from '../../contexts/AuthContext'
+import { Link } from 'react-router-dom'
 import AppHeader from '../AppHeader'
 
 export default function ForgotPassword() {
   const emailRef = useRef()
   const { resetPassword } = useAuth()
-  const [error, setError] = useState("")
-  const [message, setMessage] = useState("")
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
 
@@ -16,13 +16,13 @@ export default function ForgotPassword() {
     e.preventDefault()
 
     try {
-      setMessage("")
-      setError("")
+      setMessage('')
+      setError('')
       setLoading(true)
       await resetPassword(emailRef.current.value)
-      setMessage("Check your inbox for further instructions")
+      setMessage('Check your inbox for further instructions')
     } catch {
-      setError("Failed to reset password")
+      setError('Failed to reset password')
     }
 
     setLoading(false)
@@ -31,29 +31,29 @@ export default function ForgotPassword() {
   return (
     <Container>
       <AppHeader props={{ home: false, logoutUser: false }} />
-      <div className="d-flex justify-content-center">
-        <div className="pt-3 w-100" style={{ maxWidth: "400px" }}>
+      <div className='d-flex justify-content-center'>
+        <div className='pt-3 w-100' style={{ maxWidth: '400px' }}>
           <Card>
             <Card.Body>
-              <h2 className="text-center mb-4">Password Reset</h2>
-              {error && <Alert variant="danger">{error}</Alert>}
-              {message && <Alert variant="success">{message}</Alert>}
+              <h2 className='text-center mb-4'>Password Reset</h2>
+              {error && <Alert variant='danger'>{error}</Alert>}
+              {message && <Alert variant='success'>{message}</Alert>}
               <Form onSubmit={handleSubmit}>
-                <Form.Group id="email">
+                <Form.Group id='email'>
                   <Form.Label>Email</Form.Label>
-                  <Form.Control type="email" ref={emailRef} required />
+                  <Form.Control type='email' ref={emailRef} required />
                 </Form.Group>
-                <Button disabled={loading} className="mt-2 w-100" type="submit">
+                <Button disabled={loading} className='mt-2 w-100' type='submit'>
                   Reset Password
                 </Button>
               </Form>
-              <div className="w-100 text-center mt-3">
-                <Link to="/login">Login</Link>
+              <div className='w-100 text-center mt-3'>
+                <Link to='/login'>Login</Link>
               </div>
             </Card.Body>
           </Card>
-          <div className="w-100 text-center mt-2">
-            Need an account? <Link to="/signup">Sign Up</Link>
+          <div className='w-100 text-center mt-2'>
+            Need an account? <Link to='/signup'>Sign Up</Link>
           </div>
         </div>
       </div>

@@ -10,10 +10,10 @@ export default function ConfirmToast({ props }) {
   }
 
   return (
-    <ToastContainer className="p-3" position='top-end' style={{ zIndex: '9999' }}>
+    <ToastContainer className='p-3' position='top-end' style={{ zIndex: '9999' }}>
       <Toast show={show} onClose={toggleShow} delay={8000} autohide>
         <Toast.Header className={props.type}>
-          <strong className="me-auto">{props.header}</strong>
+          <strong className='me-auto'>{props.header}</strong>
         </Toast.Header>
         <Toast.Body className={props.type}>
           <h6>{props.message}</h6>

@@ -22,14 +22,14 @@ function App() {
             <DbFlightContextProvider>
               <FlightContextProvider>
                 <Routes>
-                  <Route path="/" element={<LoginLanding />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/newflight" element={<FlightNavigate newFlight={true} />} />
-                  <Route path="/bulk" element={<BulkNavigate />} />
-                  <Route path="/book" element={<FlightBook />} />
-                  <Route path="/dbflight" element={<FlightNavigate newFlight={false} />} />
+                  <Route path='/' element={<LoginLanding />} />
+                  <Route path='/signup' element={<Signup />} />
+                  <Route path='/login' element={<Login />} />
+                  <Route path='/forgot-password' element={<ForgotPassword />} />
+                  <Route path='/newflight' element={<FlightNavigate newFlight={true} />} />
+                  <Route path='/bulk' element={<BulkNavigate />} />
+                  <Route path='/book' element={<FlightBook />} />
+                  <Route path='/dbflight' element={<FlightNavigate newFlight={false} />} />
                 </Routes>
               </FlightContextProvider>
             </DbFlightContextProvider>

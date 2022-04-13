@@ -93,7 +93,7 @@ export default function EditLicenses({ props }) {
     <Modal
       show={show}
       onHide={handleClose}
-      backdrop="static"
+      backdrop='static'
       keyboard={false}
     >
       <Modal.Header closeButton>
@@ -104,7 +104,7 @@ export default function EditLicenses({ props }) {
           <Card.Title className='text-center'>Available Licenses</Card.Title>
           <Card.Body>
             <Row>
-              <InputGroup className="mb-3">
+              <InputGroup className='mb-3'>
                 <Col>
                   {displayLicenses()}
                 </Col>
@@ -126,10 +126,10 @@ export default function EditLicenses({ props }) {
         </Card>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant='secondary' onClick={handleClose}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleOk}>OK</Button>
+        <Button variant='primary' onClick={handleOk}>OK</Button>
       </Modal.Footer>
     </Modal>
   )

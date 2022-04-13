@@ -198,7 +198,7 @@ export default function FlightContainer({ newFlight }) {
             <Image className='igc-image pb-1' src='assets/has_igc.png' />
           </Row>
           <Row>
-            <Badge pill bg="primary" >Replace / Delete</Badge>
+            <Badge pill bg='primary' >Replace / Delete</Badge>
           </Row>
         </>
       )
@@ -209,7 +209,7 @@ export default function FlightContainer({ newFlight }) {
             <Image className='igc-image pb-1' src='assets/no_igc.png' />
           </Row>
           <Row>
-            <Badge pill bg="primary" >Add IGC</Badge>
+            <Badge pill bg='primary' >Add IGC</Badge>
           </Row>
         </>
       )
@@ -420,7 +420,7 @@ export default function FlightContainer({ newFlight }) {
         <Row className='pt-2'>
           <Col sm>
             <FloatingLabel label='Flight Comments:'>
-              <Form.Control as="textarea" rows={6} placeholder='Flight Comments' ref={flightCommentsRef} />
+              <Form.Control as='textarea' rows={6} placeholder='Flight Comments' ref={flightCommentsRef} />
             </FloatingLabel>
           </Col>
         </Row>

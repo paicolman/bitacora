@@ -140,9 +140,9 @@ export default function BulkUpload({ files }) {
   return (
     <Modal
       show={show}
-      backdrop="static"
+      backdrop='static'
       keyboard={false}
-      size="lg"
+      size='lg'
     >
       <Modal.Header closeButton onClick={handleClose}>
         <Modal.Title>Bulk upload</Modal.Title>
@@ -153,7 +153,7 @@ export default function BulkUpload({ files }) {
         </ListGroup>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant='secondary' onClick={handleClose}>
           Done
         </Button>
       </Modal.Footer>

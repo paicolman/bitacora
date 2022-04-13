@@ -55,11 +55,11 @@ export default function ShowLicenses() {
     <>
       <div className={'licenses-container'}>
         <h4>Licenses</h4>
-        <ListGroup variant="flush" >
+        <ListGroup variant='flush' >
           {licenseList()}
         </ListGroup>
       </div>
-      <Badge pill bg="primary" onClick={handleOpenDlg}>
+      <Badge pill bg='primary' onClick={handleOpenDlg}>
         Change this
       </Badge>
       <div id='licensesPopup'>

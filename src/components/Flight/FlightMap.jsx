@@ -26,11 +26,11 @@ export default function FlightMap() {
 
   return (
     <>
-      <div id="map" style={{ width: '100%', height: '600px', border: '3px solid black' }}>
+      <div id='map' style={{ width: '100%', height: '600px', border: '3px solid black' }}>
         <MapContainer center={position} zoom={13} scrollWheelZoom={false}>
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>'"
           />
           <FlightTrack />
           <Marker position={markerPos}>
@@ -39,19 +39,19 @@ export default function FlightMap() {
         </MapContainer>
       </div>
       <Accordion>
-        <Accordion.Item eventKey='0'>
-          <Accordion.Header>Altitude</Accordion.Header>
+        <Accordion.Item eventKey='1'>
+          <Accordion.Header className='pt-0'>Altitude</Accordion.Header>
           <Accordion.Body>
             <FlightChart chartType='pressureAltitude' />
           </Accordion.Body>
         </Accordion.Item>
-        <Accordion.Item eventKey='1'>
+        <Accordion.Item eventKey='2'>
           <Accordion.Header>Vertical Speed</Accordion.Header>
           <Accordion.Body>
             <FlightChart chartType='verticalSpeed' />
           </Accordion.Body>
         </Accordion.Item>
-        <Accordion.Item eventKey='2'>
+        <Accordion.Item eventKey='3'>
           <Accordion.Header>Flight Speed</Accordion.Header>
           <Accordion.Body>
             <FlightChart chartType='speed' />

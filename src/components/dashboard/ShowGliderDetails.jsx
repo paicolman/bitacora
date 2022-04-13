@@ -33,9 +33,9 @@ export default function ShowGliderDetails({ props }) {
     <Modal
       show={show}
       onHide={handleClose}
-      backdrop="static"
+      backdrop='static'
       keyboard={false}
-      size="lg"
+      size='lg'
     >
       <Modal.Header closeButton>
         <Modal.Title>{gliderName}</Modal.Title>
@@ -81,7 +81,7 @@ export default function ShowGliderDetails({ props }) {
         </Card>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant='secondary' onClick={handleClose}>
           Close
         </Button>
       </Modal.Footer>

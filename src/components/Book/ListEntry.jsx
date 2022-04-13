@@ -14,7 +14,7 @@ export default function ListEntry({ flight }) {
 
   function handleGetDetails() {
     setActiveFlight(flight)
-    setShowDetails(<Navigate to="/dbflight" />)
+    setShowDetails(<Navigate to='/dbflight' />)
   }
   return (
     <>
@@ -22,7 +22,7 @@ export default function ListEntry({ flight }) {
       <Card className='mt-3'>
         <Card.Header>
           <Card.Title style={{ float: 'left' }}><h4>{flight.flightData.flightDate}</h4></Card.Title>
-          <Button variant="primary" style={{ float: 'right' }} size='sm' onClick={handleGetDetails} >Details</Button>
+          <Button variant='primary' style={{ float: 'right' }} size='sm' onClick={handleGetDetails} >Details</Button>
         </Card.Header>
         <Card.Body>
           <Row>

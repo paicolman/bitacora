@@ -23,7 +23,7 @@ export default function EditMaxHeight({ props }) {
     <Modal
       show={show}
       onHide={handleClose}
-      backdrop="static"
+      backdrop='static'
       keyboard={false}
     >
       <Modal.Header closeButton>
@@ -35,10 +35,10 @@ export default function EditMaxHeight({ props }) {
         </FloatingLabel>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant='secondary' onClick={handleClose}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleOk}>OK</Button>
+        <Button variant='primary' onClick={handleOk}>OK</Button>
       </Modal.Footer>
     </Modal>
   )

@@ -86,7 +86,7 @@ export default function ShowGliders() {
         <Card.Title>Here are your flying machines!</Card.Title>
         <Card.Body>
           {glidersList()}
-          <Badge className='mt-2' pill bg="primary" onClick={handleOpenDlg}>
+          <Badge className='mt-2' pill bg='primary' onClick={handleOpenDlg}>
             Change this
           </Badge>
         </Card.Body>

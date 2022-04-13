@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import app from '../firebase'
 import { getDatabase, onValue, ref, set } from 'firebase/database'
 import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage'
+import PleaseWait from '../components/PleaseWait'
 
 export const DbFlightContext = React.createContext()
 
@@ -10,6 +11,8 @@ export default function DbFlightContextProvider({ children }) {
   const { currentUser } = useAuth()
   const [flights, setFlights] = useState()
   const [activeFlight, setActiveFlight] = useState()
+  const [pleaseWait, setPleaseWait] = useState(null)
+
 
   useEffect(() => {
     dbEventBus.dispatch('switchActiveFlight', activeFlight)

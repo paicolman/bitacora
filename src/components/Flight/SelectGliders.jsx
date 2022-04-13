@@ -91,7 +91,7 @@ export default function SelectGliders({ gliderIdFromDB }) {
 
       return (
         <>
-          <Form.Select defaultValue={defOption} onChange={switchGlider} size="sm">
+          <Form.Select defaultValue={defOption} onChange={switchGlider} size='sm'>
             {options}
           </Form.Select>
           <Card className='mt-1'>

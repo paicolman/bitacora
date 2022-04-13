@@ -3,6 +3,7 @@ import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { Badge, Card, Row, Col, Button } from 'react-bootstrap'
 import EditMainData from './EditMainData'
 import ShowLicenses from './ShowLicenses'
+import PleaseWait from '../PleaseWait'
 
 export default function ShowMainData({ newPilot }) {
 
@@ -72,7 +73,7 @@ export default function ShowMainData({ newPilot }) {
         <Card.Header><h1>{mainData?.pilotName}</h1></Card.Header>
         <Card.Subtitle className='pt-2'>
           <h2>Flying since: {mainData?.flyingSince}</h2>
-          <Badge pill bg="primary" onClick={handleOpenDlg}>
+          <Badge pill bg='primary' onClick={handleOpenDlg}>
             Change this
           </Badge>
         </Card.Subtitle>

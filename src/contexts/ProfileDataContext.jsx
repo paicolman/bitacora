@@ -74,8 +74,10 @@ export function ProfileDataProvider({ children }) {
   }
 
   function pilotIsRegistered() {
+    console.log(`check pilot is registered:${currentUser.uid}`)
     const db = getDatabase(app)
     const dbRef = ref(db)
+    console.log(dbRef)
     let pilotRegistered = false
     const checkRegisteredPilot = new Promise((resolve) => {
       onValue(dbRef, (snapshot) => {
@@ -94,8 +96,6 @@ export function ProfileDataProvider({ children }) {
           resolve('unregistered')
         }
       })
-
-
     })
     return checkRegisteredPilot
   }
@@ -103,6 +103,7 @@ export function ProfileDataProvider({ children }) {
   let preventFlood = false //TODO: Check if this is still needed
 
   function initPilotLogBook() {
+    console.log('init Logbook')
     const db = getDatabase(app)
     const dbRef = ref(db)
 

@@ -1,14 +1,14 @@
-import React, { useRef, useState } from "react"
-import { Container, Form, Button, Card, Alert } from "react-bootstrap"
-import { useAuth } from "../../contexts/AuthContext"
-import { Link, useNavigate } from "react-router-dom"
+import React, { useRef, useState } from 'react'
+import { Container, Form, Button, Card, Alert } from 'react-bootstrap'
+import { useAuth } from '../../contexts/AuthContext'
+import { Link, useNavigate } from 'react-router-dom'
 import AppHeader from '../AppHeader'
 
 export default function Login() {
   const emailRef = useRef()
   const passwordRef = useRef()
   const { login } = useAuth()
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const history = useNavigate()
 
@@ -16,13 +16,13 @@ export default function Login() {
     e.preventDefault()
 
     try {
-      setError("")
+      setError('')
       setLoading(true)
       await login(emailRef.current.value, passwordRef.current.value)
-      history("/")
+      history('/')
     } catch (e) {
       console.error(e)
-      setError("Failed to log in")
+      setError('Failed to log in')
     }
 
     setLoading(false)
@@ -31,32 +31,32 @@ export default function Login() {
   return (
     <Container>
       <AppHeader props={{ home: false, logoutUser: false }} />
-      <div className="d-flex justify-content-center">
-        <div className="w-100 pt-3" style={{ maxWidth: "400px" }}>
+      <div className='d-flex justify-content-center'>
+        <div className='w-100 pt-3' style={{ maxWidth: '400px' }}>
           <Card>
             <Card.Body>
-              <h2 className="text-center mb-4">Log In</h2>
-              {error && <Alert variant="danger">{error}</Alert>}
+              <h2 className='text-center mb-4'>Log In</h2>
+              {error && <Alert variant='danger'>{error}</Alert>}
               <Form onSubmit={handleSubmit}>
-                <Form.Group id="email">
+                <Form.Group id='email'>
                   <Form.Label>Email</Form.Label>
-                  <Form.Control type="email" ref={emailRef} required />
+                  <Form.Control type='email' ref={emailRef} required />
                 </Form.Group>
-                <Form.Group id="password">
+                <Form.Group id='password'>
                   <Form.Label>Password</Form.Label>
-                  <Form.Control type="password" ref={passwordRef} required />
+                  <Form.Control type='password' ref={passwordRef} required />
                 </Form.Group>
-                <Button disabled={loading} className="mt-3 w-100" type="submit">
+                <Button disabled={loading} className='mt-3 w-100' type='submit'>
                   Log In
                 </Button>
               </Form>
-              <div className="w-100 text-center mt-3">
-                <Link to="/forgot-password">Forgot Password?</Link>
+              <div className='w-100 text-center mt-3'>
+                <Link to='/forgot-password'>Forgot Password?</Link>
               </div>
             </Card.Body>
           </Card>
-          <div className="w-100 text-center mt-2">
-            Need an account? <Link to="/signup">Sign Up</Link>
+          <div className='w-100 text-center mt-2'>
+            Need an account? <Link to='/signup'>Sign Up</Link>
           </div>
         </div>
       </div>

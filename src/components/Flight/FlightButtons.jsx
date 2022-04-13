@@ -11,11 +11,11 @@ export default function FlightButtons({ props }) {
 
 
   function handleGoBack() {
-    setGoBack(<Navigate to="/" />)
+    setGoBack(<Navigate to='/' />)
   }
 
   function handleGoBook() {
-    setGoBack(<Navigate to="/book" />)
+    setGoBack(<Navigate to='/book' />)
   }
 
   function handleClearData() {

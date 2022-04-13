@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import PilotDashboard from '../dashboard/PilotDashboard'
+import PleaseWait from '../PleaseWait'
 import FlightList from './FlightList'
 
 export default function BulkNavigate() {
@@ -18,10 +19,10 @@ export default function BulkNavigate() {
     let retval = (<div><h1>AN ERROR HAS OCCURED!</h1></div>)
     switch (userStatus) {
       case 'waiting':
-        retval = <div><h4>Please wait...</h4></div>
+        retval = <PleaseWait />
         break
       case 'inexistent':
-        retval = <Navigate to="/login" />
+        retval = <Navigate to='/login' />
         break
       case 'unregistered':
         retval = <PilotDashboard newPilot={true} />

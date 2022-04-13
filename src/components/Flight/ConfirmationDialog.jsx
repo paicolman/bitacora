@@ -18,7 +18,7 @@ export default function ConfirmationDialog({ props }) {
     <Modal
       show={show}
       onHide={handleCancel}
-      backdrop="static"
+      backdrop='static'
       keyboard={false}
     >
       <Modal.Header closeButton>
@@ -28,8 +28,8 @@ export default function ConfirmationDialog({ props }) {
         {props.text}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
-        <Button variant="danger" onClick={handleOk}>{props.action}</Button>
+        <Button variant='secondary' onClick={handleCancel}>Cancel</Button>
+        <Button variant='danger' onClick={handleOk}>{props.action}</Button>
       </Modal.Footer>
     </Modal>
   )

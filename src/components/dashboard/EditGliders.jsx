@@ -182,7 +182,7 @@ export default function EditGliders({ props }) {
                       <Form.Check
                         id={`default-${index}`}
                         style={{ display: 'inline-flex' }}
-                        type="switch"
+                        type='switch'
                         label='Main Wing'
                         checked={glider.default}
                         onChange={handleDefault}
@@ -244,7 +244,7 @@ export default function EditGliders({ props }) {
   return (
     <>
       <Modal
-        size="lg"
+        size='lg'
         show={show}
         onHide={handleClose}
         backdrop='static'

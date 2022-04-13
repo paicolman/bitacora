@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import IGCParser from 'igc-parser'
 import { getRhumbLineBearing, getDistance, getPathLength } from 'geolib'
 import { useAuth } from '../contexts/AuthContext'
@@ -6,11 +6,14 @@ import app from '../firebase'
 import { getDatabase, onValue, ref, set } from 'firebase/database'
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
 import uuid from 'react-uuid'
+import PleaseWait from '../components/PleaseWait'
 
 export const FlightContext = React.createContext()
 
 export default function FlightContextProvider({ children }) {
+  const [pleaseWait, setPleaseWait] = useState(null)
   const { currentUser } = useAuth()
+
   const diffData = []
   let isThermalFlight = false
   let isXcountry = false
@@ -94,6 +97,7 @@ export default function FlightContextProvider({ children }) {
   }
 
   function loadIgcFromDB(igcId) {
+    setPleaseWait(<PleaseWait />)
     const storage = getStorage()
     getDownloadURL(storageRef(storage, `${currentUser.uid}/igc/${igcId}`))
       .then((igcUrl) => {
@@ -112,7 +116,6 @@ export default function FlightContextProvider({ children }) {
   }
 
   function parseIgcFile(igcFile) {
-
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
 
@@ -126,6 +129,7 @@ export default function FlightContextProvider({ children }) {
         clearFlightSpecs()
         getDirectData(igc)
         getDifferentialData(igc)
+        setPleaseWait(null)
         resolve(igc)
       }
       if (igcFile) {
@@ -383,6 +387,7 @@ export default function FlightContextProvider({ children }) {
 
   return (
     <FlightContext.Provider value={flightContextValue}>
+      {pleaseWait}
       {children}
     </FlightContext.Provider>
   )
