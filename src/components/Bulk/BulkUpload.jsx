@@ -4,7 +4,7 @@ import { ProfileDataContext } from '../../contexts/ProfileDataContext'
 import { FlightContext } from '../../contexts/FlightContext'
 
 export default function BulkUpload({ files }) {
-  const { parseIgcFile, setIgcFileForDB, flightSpecs, getStartOrLanding, setFlightDate, checkAndStoreNewFlight } = useContext(FlightContext)
+  const { parseIgcFile, setIgcFileForDB, flightSpecs, getStartOrLanding, setFlightDate, getExistingFlightId, storeNewFlight } = useContext(FlightContext)
   const { getProfileData } = useContext(ProfileDataContext)
   const [show, setShow] = useState(true)
   const [uploadNames, setUploadNames] = useState([])
@@ -79,15 +79,19 @@ export default function BulkUpload({ files }) {
         parseIgcFile(file.file).then((igc) => {
           uploadStatus[uploadCount] = 'parsed'
           updateFilesList()
-          populateFlightSpecs(igc).then(() => {
+          populateFlightSpecs(igc).then(async () => {
             uploadStatus[uploadCount] = 'analyzed'
             updateFilesList()
-            checkAndStoreNewFlight().then((status) => {
-              finalUploadStatus(status)
-              updateFilesList()
-              uploadCount++
-              resolve()
-            })
+            const existingId = await getExistingFlightId()
+            if (!existingId) {
+              await storeNewFlight()
+              finalUploadStatus('UPLOADED')
+            } else {
+              finalUploadStatus('DUPLICATE')
+            }
+            updateFilesList()
+            uploadCount++
+            resolve()
           })
         })
       }

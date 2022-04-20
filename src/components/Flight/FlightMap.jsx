@@ -16,7 +16,7 @@ export default function FlightMap() {
       setMarkerPos(position)
     })
     eventBus.on('mouseOnChart', (data) => {
-      if (data.activePayload) {
+      if (data?.activePayload) {
         const lat = data.activePayload[0].payload.latitude
         const lon = data.activePayload[0].payload.longitude
         setMarkerPos([lat, lon])

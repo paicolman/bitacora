@@ -41,10 +41,9 @@ export function ProfileDataProvider({ children }) {
     const db = getDatabase(app)
     const pilotRef = ref(db, `${currentUser.uid}${path}`)
     const mainDataReady = new Promise((resolve, reject) => {
-      const unsuscribe = onValue(pilotRef, (snapshot) => {
-        resolve(snapshot.val())
+      const unsubscribe = onValue(pilotRef, (snapshot) => {
+        resolve(snapshot.val()) //!Pass unsubscribe in resolve...
       })
-      //unsuscribe.apply() //!Achtung, das sollte einkommentiert sein - effekt??
     })
     return mainDataReady
   }
@@ -74,10 +73,8 @@ export function ProfileDataProvider({ children }) {
   }
 
   function pilotIsRegistered() {
-    console.log(`check pilot is registered:${currentUser.uid}`)
     const db = getDatabase(app)
     const dbRef = ref(db)
-    console.log(dbRef)
     let pilotRegistered = false
     const checkRegisteredPilot = new Promise((resolve) => {
       onValue(dbRef, (snapshot) => {

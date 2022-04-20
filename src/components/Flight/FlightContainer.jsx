@@ -18,7 +18,7 @@ import ConfirmationDialog from './ConfirmationDialog'
 
 export default function FlightContainer({ newFlight }) {
   const { activeFlight, deleteFlight, getNextFlight, getFirstFlight } = useContext(DbFlightContext)
-  const { eventBus, flightSpecs, setLaunchOrLandingName, saveFlightData, loadIgcFromDB } = useContext(FlightContext)
+  const { eventBus, flightSpecs, setLaunchOrLandingName, saveFlightData, getExistingFlightId, loadIgcFromDB } = useContext(FlightContext)
   const { dbEventBus } = useContext(DbFlightContext)
   const launchTime = useRef()
   const launchHeight = useRef()
@@ -31,6 +31,7 @@ export default function FlightContainer({ newFlight }) {
   const startLandingDistRef = useRef()
   const flightTypeRef = useRef()
   const flightCommentsRef = useRef()
+  const duplicateFlightId = useRef()
   const [duration, setDuration] = useState('00:00:00')
   const [flightDate, setFlightDate] = useState('yyyy-MM-dd')
   const [maxHeight, setMaxHeight] = useState(0)
@@ -67,9 +68,9 @@ export default function FlightContainer({ newFlight }) {
       saveDisabled(dateInfo)
     })
     if (!newFlight && activeFlight) {
-      launchTime.current.value = activeFlight.flightData.launch.time
-      launchHeight.current.value = activeFlight.flightData.launch.pressureAltitude
-      landingTime.current.value = activeFlight.flightData.landing.time
+      launchTime.current.value = activeFlight.flightData.launchTime
+      launchHeight.current.value = activeFlight.flightData.launchHeight
+      landingTime.current.value = activeFlight.flightData.landingTime
       maxSpeedRef.current.value = activeFlight.flightData.maxSpeed.toFixed(2)
       maxClimbRef.current.value = activeFlight.flightData.maxClimb.toFixed(2)
       maxSinkRef.current.value = activeFlight.flightData.maxSink.toFixed(2)
@@ -88,9 +89,9 @@ export default function FlightContainer({ newFlight }) {
       }
     }
     dbEventBus.on('switchActiveFlight', (switchedFlight) => {
-      launchTime.current.value = switchedFlight.flightData.launch.time
-      launchHeight.current.value = switchedFlight.flightData.launch.pressureAltitude
-      landingTime.current.value = switchedFlight.flightData.landing.time
+      launchTime.current.value = switchedFlight.flightData.launchTime
+      launchHeight.current.value = switchedFlight.flightData.launchHeight
+      landingTime.current.value = switchedFlight.flightData.landingTime
       maxSpeedRef.current.value = switchedFlight.flightData.maxSpeed.toFixed(2)
       maxClimbRef.current.value = switchedFlight.flightData.maxClimb.toFixed(2)
       maxSinkRef.current.value = switchedFlight.flightData.maxSink.toFixed(2)
@@ -162,7 +163,7 @@ export default function FlightContainer({ newFlight }) {
 
   function showMessage(response) {
     let confirm = <></>
-    switch (response) {
+    switch (response.split('.')[0]) {
       case 'UPLOADED':
         confirm = <ConfirmToast props={{ type: 'success', header: 'SUCCESS!', message: 'Flight has been saved', explanation: 'This flight is now available in you log book', closeToast: closeToast }} />
         break
@@ -178,16 +179,6 @@ export default function FlightContainer({ newFlight }) {
 
   function closeToast() {
     setConfirmToast(null)
-  }
-
-  const buttonProps = {
-    handleSaveFlight: handleSaveFlight,
-    handleUpdateFlight: handleUpdateFlight,
-    clearCurrentData: clearCurrentData,
-    setImage: setImage,
-    disabledSave: disabledSave,
-    newFlight: newFlight,
-    handleDelete: handleDelete
   }
 
   function showIgc() {
@@ -245,19 +236,18 @@ export default function FlightContainer({ newFlight }) {
     }
   }
 
-  function handleUpdateFlight() {
-    const props = {
-      show: true,
-      title: `Update Flight from ${activeFlight.flightData.flightDate}`,
-      text: `Are you sure you want to update the flight from ${activeFlight.flightData.flightDate} with the actual data?`,
-      action: 'Update this flight',
-      confirm: handleSaveFlight
-    }
-    setShowConfirmDlg(<ConfirmationDialog props={props} />)
-  }
+  // function handleUpdateFlight() {
+  //   const props = {
+  //     show: true,
+  //     title: `Update Flight from ${activeFlight.flightData.flightDate}`,
+  //     text: `Are you sure you want to update the flight from ${activeFlight.flightData.flightDate} with the actual data?`,
+  //     action: 'Update this flight',
+  //     confirm: handleSaveFlight
+  //   }
+  //   setShowConfirmDlg(<ConfirmationDialog props={props} />)
+  // }
 
   async function handleSaveFlight() {
-    setShowConfirmDlg(null)
     const dataToSave = {
       launchTime: launchTime.current.value,
       landingTime: landingTime.current.value,
@@ -272,13 +262,37 @@ export default function FlightContainer({ newFlight }) {
       pathLength: parseFloat(pathLengthRef.current.value),
       comments: flightCommentsRef.current.value
     }
-    //sync flight dates first...
+    let existingId = null
     if (!newFlight) {
       flightSpecs.flightDate = activeFlight.flightData.flightDate
+      existingId = activeFlight.flightId
+    } else {
+      existingId = await getExistingFlightId()
     }
-    const flightId = activeFlight?.flightId
-    const response = await saveFlightData(dataToSave, flightId)
-    showMessage(response)
+    if (existingId) {
+      const props = {
+        show: true,
+        title: `Update existing flight from ${flightSpecs.flightDate}`,
+        text: `Are you sure you want to update the flight from ${flightSpecs.flightDate} with the actual data?`,
+        action: 'Update this flight',
+        dataToSave: dataToSave,
+        flightId: existingId,
+        confirm: updateFlight
+      }
+      setShowConfirmDlg(<ConfirmationDialog props={props} />)
+    } else {
+      const response = await saveFlightData(dataToSave, null)
+      showMessage(response)
+    }
+  }
+
+  async function updateFlight(dataToSave, existingFlightId) {
+    setShowConfirmDlg(null)
+    if (dataToSave) {
+      const response = await saveFlightData(dataToSave, existingFlightId)
+      showMessage(response)
+    }
+
   }
 
   function handleDelete() {
@@ -315,6 +329,15 @@ export default function FlightContainer({ newFlight }) {
   }
   function gliderIdFromDB() {
     return newFlight ? '' : activeFlight?.flightData?.gliderId
+  }
+
+  const buttonProps = {
+    handleSaveFlight,
+    clearCurrentData,
+    setImage,
+    disabledSave,
+    newFlight,
+    handleDelete
   }
 
   return (

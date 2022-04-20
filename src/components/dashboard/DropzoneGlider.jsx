@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import Image from 'react-bootstrap/Image'
 import { useDropzone } from 'react-dropzone'
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
@@ -10,6 +10,10 @@ import { useAuth } from '../../contexts/AuthContext'
 export default function DropzoneGlider({ gliderId }) {
   const { currentUser } = useAuth()
   const [gliderpic, setGliderpic] = useState(null)
+
+  useEffect(() => {
+    getPicUrl()
+  }, [gliderId])
 
   function resizeFile(file, maxX, maxY) {
     return new Promise((resolve) => {
@@ -66,14 +70,11 @@ export default function DropzoneGlider({ gliderId }) {
       const storageRef = ref(storage, `${currentUser.uid}/images/${gliderId}/thumbnail`)
       getDownloadURL(storageRef, `${currentUser.uid}/images/${gliderId}/thumbnail`).then((url) => {
         setGliderpic(url)
-      }, () => {
+      }).catch(err => {
         setGliderpic('assets/dropzone_1.jpg')
       })
     }
   }
-
-  getPicUrl()
-
 
   return (
     <div {...getRootProps()}>

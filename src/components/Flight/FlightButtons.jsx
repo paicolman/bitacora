@@ -63,7 +63,7 @@ export default function FlightButtons({ props }) {
                 <Button variant='secondary' size='lg' style={{ width: '100%' }} onClick={handleGetPrevious}>Prev</Button>
               </Col>
               <Col sm>
-                <Button variant='primary' size='lg' style={{ width: '100%' }} onClick={props.handleUpdateFlight}>Update Flight</Button>
+                <Button variant='primary' size='lg' style={{ width: '100%' }} onClick={props.handleSaveFlight}>Update Flight</Button>
               </Col>
               <Col sm>
                 <Button variant='info' size='lg' style={{ width: '100%' }} onClick={handleGoBook}>Flight Book</Button>

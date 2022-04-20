@@ -13,7 +13,6 @@ export default function DbFlightContextProvider({ children }) {
   const [activeFlight, setActiveFlight] = useState()
   const [pleaseWait, setPleaseWait] = useState(null)
 
-
   useEffect(() => {
     dbEventBus.dispatch('switchActiveFlight', activeFlight)
   }, [activeFlight])
@@ -30,19 +29,6 @@ export default function DbFlightContextProvider({ children }) {
     },
   };
 
-  const dbFlightContextValue = {
-    dbEventBus,
-    flights,
-    activeFlight,
-    setActiveFlight: setActiveFlight,
-    sortFlights: sortFlights,
-    getAllFlights: getAllFlights,
-    deleteFlight: deleteFlight,
-    getFirstFlight: getFirstFlight,
-    getNextFlight: getNextFlight,
-    getPreviousFlight: getPreviousFlight
-  }
-
   function getAllFlights() {
     const db = getDatabase(app)
     const flightsRef = ref(db, `${currentUser.uid}/flights`)
@@ -58,30 +44,57 @@ export default function DbFlightContextProvider({ children }) {
     // unsubscribe.apply() //! How to unsubscribe?
   }
 
-
-  function sortFlights(sortBy) {
+  function sortFlights(sortBy, ascending) {
     let sorted = []
+    console.log(sortBy)
     switch (sortBy) {
       case 'date':
-        sorted = flights.sort((a, b) => (a.flightData.flightDate > b.flightData.flightDate ? 1 : -1))
+        sorted = ascending ?
+          flights.sort((a, b) => (a.flightData.flightDate > b.flightData.flightDate ? 1 : -1)) :
+          flights.sort((a, b) => (a.flightData.flightDate < b.flightData.flightDate ? 1 : -1))
         break
       case 'duration':
-        sorted = flights.sort((a, b) => (a.flightData.duration < b.flightData.duration ? 1 : -1))
+        sorted = ascending ?
+          flights.sort((a, b) => (a.flightData.duration < b.flightData.duration ? 1 : -1)) :
+          flights.sort((a, b) => (a.flightData.duration > b.flightData.duration ? 1 : -1))
         break
       case 'height':
-        sorted = flights.sort((a, b) => (a.flightData.maxHeight < b.flightData.maxHeight ? 1 : -1))
+        sorted = ascending ?
+          flights.sort((a, b) => (a.flightData.maxHeight < b.flightData.maxHeight ? 1 : -1)) :
+          flights.sort((a, b) => (a.flightData.maxHeight > b.flightData.maxHeight ? 1 : -1))
         break
       case 'launch':
-        sorted = flights.sort((a, b) => (a.flightData.launchName > b.flightData.launchName ? 1 : -1))
+        sorted = ascending ?
+          flights.sort((a, b) => (a.flightData.launchName > b.flightData.launchName ? 1 : -1)) :
+          flights.sort((a, b) => (a.flightData.launchName < b.flightData.launchName ? 1 : -1))
         break
       case 'landing':
-        sorted = flights.sort((a, b) => (a.flightData.landingName > b.flightData.landingName ? 1 : -1))
+        sorted = ascending ?
+          flights.sort((a, b) => (a.flightData.landingName > b.flightData.landingName ? 1 : -1)) :
+          flights.sort((a, b) => (a.flightData.landingName < b.flightData.landingName ? 1 : -1))
         break
       default:
-        sorted = flights.sort((a, b) => (a.flightDate > b.flightDate ? 1 : -1))
+        sorted = ascending ?
+          flights.sort((a, b) => (a.flightDate > b.flightDate ? 1 : -1)) :
+          flights.sort((a, b) => (a.flightDate < b.flightDate ? 1 : -1))
         break
     }
     setFlights([...sorted])
+  }
+
+  function getPreviousFlight() {
+    if (flights.length > 0) {
+      const flightIndex = flights.findIndex(flight => flight.flightId === activeFlight.flightId)
+      if (flightIndex > 0) {
+        setActiveFlight(flights[flightIndex - 1])
+        return true
+      }
+      console.warn('No PREV flight!')
+      return false
+    } else {
+      console.warn('No flights, array empty!')
+      return false
+    }
   }
 
   function getNextFlight() {
@@ -92,20 +105,6 @@ export default function DbFlightContextProvider({ children }) {
         return true
       }
       console.warn('No NEXT flight!')
-      return false
-    } else {
-      console.warn('No flights, array empty!')
-      return false
-    }
-  }
-  function getPreviousFlight() {
-    if (flights.length > 0) {
-      const flightIndex = flights.findIndex(flight => flight.flightId === activeFlight.flightId)
-      if (flightIndex > 0) {
-        setActiveFlight(flights[flightIndex - 1])
-        return true
-      }
-      console.warn('No PREV flight!')
       return false
     } else {
       console.warn('No flights, array empty!')
@@ -123,7 +122,6 @@ export default function DbFlightContextProvider({ children }) {
     }
   }
 
-
   function deleteFlight() {
     if (activeFlight) {
       return new Promise((resolve, reject) => {
@@ -132,10 +130,11 @@ export default function DbFlightContextProvider({ children }) {
         const db = getDatabase(app)
         const flightRef = ref(db, `${currentUser.uid}/flights/${activeFlight.flightId}`)
         const storage = getStorage()
-        const unsubscribe = onValue(flightRef, (snapshot) => { //! Unsubscribe??
+        const unsubscribe = onValue(flightRef, (snapshot) => {
           set(flightRef, null)
           resolve()
         })
+        unsubscribe.apply()
         if (activeFlight.flightData.hasIgc) {
           const igcRef = storageRef(storage, `${currentUser.uid}/igc/${activeFlight.flightId}`)
           deleteObject(igcRef).then(() => {
@@ -146,8 +145,20 @@ export default function DbFlightContextProvider({ children }) {
           })
         }
       })
-
     }
+  }
+
+  const dbFlightContextValue = {
+    dbEventBus,
+    flights,
+    activeFlight,
+    setActiveFlight,
+    sortFlights,
+    getAllFlights,
+    deleteFlight,
+    getFirstFlight,
+    getNextFlight,
+    getPreviousFlight
   }
 
   return (

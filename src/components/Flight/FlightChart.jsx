@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Brush } from 'recharts';
 import { FlightContext } from '../../contexts/FlightContext'
 
 export default function FlightChart({ chartType }) {
@@ -13,27 +13,44 @@ export default function FlightChart({ chartType }) {
 
     eventBus.on('igcParsed', (igc) => {
       if (chartType === 'pressureAltitude') {
-        setData(igc.fixes)
+        decimate(igc.fixes, chartType)
       } else {
-        setData(diffData)
+        decimate(diffData, chartType)
       }
     })
   }, [])
+
+  function decimate(flightData, chartType) {
+    // console.log(flightData)
+    const dataPointsToDisplay = 400
+    const reductionRate = Math.floor(flightData.length / dataPointsToDisplay)
+    let decimated = []
+    //if (reductionRate > 0) {
+    for (let counter = 0; counter < flightData.length - reductionRate; counter += reductionRate) {
+      const value = {}
+      value[chartType] = flightData[counter][chartType]
+      value['latitude'] = flightData[counter]['latitude']
+      value['longitude'] = flightData[counter]['longitude']
+      for (let i = 1; i < reductionRate; i++) {
+        value[chartType] += flightData[counter + i][chartType]
+
+      }
+      value[chartType] = (value[chartType] / reductionRate).toFixed(2)
+      decimated.push(value)
+    }
+    // } else {
+    //   decimated = [...flightData]
+    // }
+    // console.log(decimated)
+    setData(decimated)
+  }
 
   function mouseMove(e) {
     eventBus.dispatch('mouseOnChart', e)
   }
 
-  function started() {
-    console.log('STARTED')
-  }
-
-  function stopped() {
-    console.log('STOPPED')
-  }
-
   return (
-    <div id='map' style={{ width: '100%', height: '200px', border: '2px solid black' }}>
+    <div id='map' style={{ width: '100%', height: '200px', border: '1px solid black' }}>
       <ResponsiveContainer width={'100%'} height={200}>
         <AreaChart
           data={data}
@@ -45,11 +62,12 @@ export default function FlightChart({ chartType }) {
           }}
           onMouseMove={mouseMove}
         >
-          <CartesianGrid strokeDasharray='3 3' />
-          <XAxis dataKey='time' />
-          <YAxis />
           <Tooltip />
-          <Area type='monotone' dataKey={chartType} stroke='#8884d8' fill='#8884d8' onAnimationStart={started} onAnimationEnd={stopped} />
+          <CartesianGrid strokeDasharray='3 3' />
+          <XAxis dataKey='time' interval='preserveStartEnd' minTickGap={30} />
+          <YAxis dataKey={chartType} />
+          <Area type='monotone' dataKey={chartType} stroke='#8884d8' fill='#8884d8' />
+          {/* <Brush dataKey={chartType} height={20} stroke="#8884d8" /> */}
         </AreaChart>
       </ResponsiveContainer>
 

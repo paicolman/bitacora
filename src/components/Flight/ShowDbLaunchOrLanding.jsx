@@ -8,7 +8,7 @@ export default function ShowDbLaunchOrLanding({ site }) {
 
   useEffect(() => {
     lauchLandingSite.current.value = site.name
-  })
+  }, [])
 
   function handleChange() {
     setLaunchOrLandingName({ type: site.type, name: lauchLandingSite.current.value })

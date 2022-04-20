@@ -11,7 +11,11 @@ export default function ConfirmationDialog({ props }) {
 
   function handleOk() {
     setShow(false)
-    props.confirm(true)
+    if (props.dataToSave) {
+      props.confirm(props.dataToSave, props.flightId)
+    } else {
+      props.confirm(true)
+    }
   }
 
   return (

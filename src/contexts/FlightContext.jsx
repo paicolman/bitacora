@@ -54,26 +54,6 @@ export default function FlightContextProvider({ children }) {
     },
   };
 
-  const flightContextValue = {
-    eventBus,
-    diffData,
-    flightSpecs: flightSpecs,
-    loadIgcFile: loadIgcFile,
-    loadIgcFromDB: loadIgcFromDB,
-    discardIgc: discardIgc,
-    parseIgcFile: parseIgcFile,
-    setIgcFileForDB: setIgcFileForDB,
-    getStartOrLanding: getStartOrLanding,
-    setLaunchOrLandingName: setLaunchOrLandingName,
-    setFlightDate: setFlightDate,
-    setMaxHeight: setMaxHeight,
-    setSelectedGlider: setSelectedGlider,
-    setUsedLicense: setUsedLicense,
-    saveFlightData: saveFlightData,
-    checkAndStoreNewFlight: checkAndStoreNewFlight
-  }
-
-
   function loadIgcFile(igcFile) {
     parseIgcFile(igcFile).then((igc) => {
       if (igc) {
@@ -232,7 +212,8 @@ export default function FlightContextProvider({ children }) {
           speed: avgHspeed,
           bearing: bear,
           latitude: fix.latitude,
-          longitude: fix.longitude
+          longitude: fix.longitude,
+          time: fix.time
         })
         prevFix = fix
       }
@@ -275,7 +256,6 @@ export default function FlightContextProvider({ children }) {
       })
   }
 
-
   function setLaunchOrLandingName(siteInfo) {
     if (siteInfo.type === 'Launch:') {
       flightSpecs.launchName = siteInfo.name
@@ -301,7 +281,7 @@ export default function FlightContextProvider({ children }) {
     flightSpecs.usedLicense = licenseInfo
   }
 
-  function saveFlightData(dataToSave, existingFlightId) {
+  async function saveFlightData(dataToSave, existingFlightId) {
     flightSpecs.duration = dataToSave.duration
     flightSpecs.flightType = dataToSave.flightType
     flightSpecs.landingTime = dataToSave.landingTime
@@ -317,7 +297,7 @@ export default function FlightContextProvider({ children }) {
     if (existingFlightId) {
       return updateFlight(existingFlightId)
     } else {
-      return checkAndStoreNewFlight()
+      return storeNewFlight()
     }
   }
 
@@ -328,39 +308,40 @@ export default function FlightContextProvider({ children }) {
     })
   }
 
-  function checkAndStoreNewFlight() {
-    return new Promise((resolve, reject) => {
+  function getExistingFlightId() {
+    return new Promise(resolve => {
       const db = getDatabase(app)
       const existingFlightsRef = ref(db, `${currentUser.uid}/flights`)
       let duplicate = false
+      let existingflightId = null
       const unsuscribeExisting = onValue(existingFlightsRef, (snapshot) => {
-        // unsuscribeExistingRef.apply()
         const flights = snapshot.val()
-
         for (const flightId in flights) {
           duplicate = (flights[flightId].flightDate === flightSpecs.flightDate) && (flights[flightId].launchTime === flightSpecs.launchTime)
           if (duplicate) {
             console.warn('Duplicate flight')
             console.warn(flights[flightId].flightDate, flightSpecs.flightDate, flights[flightId].launchTime, flightSpecs.launchTime)
+            existingflightId = flightId
             break
           }
         }
+        resolve(existingflightId)
       })
       unsuscribeExisting.apply()
+    })
+  }
 
+  function storeNewFlight() {
+    return new Promise(resolve => {
+      const db = getDatabase(app)
       const flightId = uuid()
       const flightRef = ref(db, `${currentUser.uid}/flights/${flightId}`)
       const unsubscribeNew = onValue(flightRef, () => {
-        if (!duplicate) {
-          set(flightRef, flightSpecs)
-          if (igcFileForDB) {
-            storeIgc(flightId)
-          }
-          resolve('UPLOADED')
-        } else {
-          console.warn('Flight is duplicated in DB')
-          resolve('DUPLICATE')
+        set(flightRef, flightSpecs)
+        if (igcFileForDB) {
+          storeIgc(flightId)
         }
+        resolve('UPLOADED')
       }, (err) => {
         console.error(err)
         resolve(err)
@@ -384,6 +365,25 @@ export default function FlightContextProvider({ children }) {
     })
   }
 
+  const flightContextValue = {
+    eventBus,
+    diffData,
+    flightSpecs: flightSpecs,
+    loadIgcFile,
+    loadIgcFromDB,
+    discardIgc,
+    parseIgcFile,
+    setIgcFileForDB,
+    getStartOrLanding,
+    setLaunchOrLandingName,
+    setFlightDate,
+    setMaxHeight,
+    setSelectedGlider,
+    setUsedLicense,
+    saveFlightData,
+    getExistingFlightId,
+    storeNewFlight
+  }
 
   return (
     <FlightContext.Provider value={flightContextValue}>

@@ -7,14 +7,14 @@ export default function ShowLaunchOrLanding({ site }) {
   const lauchLandingSite = useRef()
 
   useEffect(() => {
-    getStartOrLanding(site, setName)
-  })
+    if (site.point) { //Do search only if there is a valid IGC point
+      getStartOrLanding(site, setName)
+    }
+  }, [site])
 
   function setName(startOrLanding) {
     if (startOrLanding) {
       lauchLandingSite.current.value = startOrLanding.name
-    } else {
-      lauchLandingSite.current.value = ''
     }
   }
 

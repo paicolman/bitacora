@@ -15,7 +15,6 @@ export default function ShowGliders() {
 
   async function getDataFromDb() {
     if (!dataReady) {
-
       const data = await getProfileData('/profile/gliders')
       setgliders(data)
       setDataReady(true)
