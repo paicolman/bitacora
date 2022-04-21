@@ -7,7 +7,7 @@ export default function FlightTrack() {
   const [track, setTrack] = useState(null)
   const { eventBus } = useContext(FlightContext)
   const map = useMap()
-  const pathOptions = { color: 'red', weight: 2 }
+  const pathOptions = { color: 'red', weight: 1.5 }
   const position = [47.44722, 8.62731]
 
   useEffect(() => {
@@ -17,7 +17,10 @@ export default function FlightTrack() {
     })
 
     eventBus.on('igcParsed', (igc) => {
+      console.log('TRACK')
+      console.dir(igc)
       if (igc) {
+        console.dir(igc)
         const trackCenter = getCenterOfBounds(igc.fixes)
         const bounds = getBounds(igc.fixes)
         map.panTo([trackCenter.latitude, trackCenter.longitude])

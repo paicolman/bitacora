@@ -58,6 +58,7 @@ export default function FlightContextProvider({ children }) {
     parseIgcFile(igcFile).then((igc) => {
       if (igc) {
         igcFileForDB = igcFile
+        console.log('parsing...')
         eventBus.dispatch('igcParsed', igc)
       }
     }).catch(e => {
@@ -65,6 +66,7 @@ export default function FlightContextProvider({ children }) {
       console.error(e)
     })
   }
+
 
   function discardIgc() {
     eventBus.dispatch('newFile', null)

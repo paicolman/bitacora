@@ -21,16 +21,21 @@ export default function FlightChart({ chartType }) {
   }, [])
 
   function decimate(flightData, chartType) {
-    // console.log(flightData)
-    const dataPointsToDisplay = 400
+    console.log(chartType)
+    const dataPointsToDisplay = 800
     const reductionRate = Math.floor(flightData.length / dataPointsToDisplay)
     let decimated = []
-    //if (reductionRate > 0) {
+    if (reductionRate === 0) {
+      console.log(flightData)
+      setData(flightData)
+      return
+    }
     for (let counter = 0; counter < flightData.length - reductionRate; counter += reductionRate) {
       const value = {}
       value[chartType] = flightData[counter][chartType]
       value['latitude'] = flightData[counter]['latitude']
       value['longitude'] = flightData[counter]['longitude']
+      value['time'] = flightData[counter]['time']
       for (let i = 1; i < reductionRate; i++) {
         value[chartType] += flightData[counter + i][chartType]
 
@@ -38,10 +43,7 @@ export default function FlightChart({ chartType }) {
       value[chartType] = (value[chartType] / reductionRate).toFixed(2)
       decimated.push(value)
     }
-    // } else {
-    //   decimated = [...flightData]
-    // }
-    // console.log(decimated)
+    console.log(decimated)
     setData(decimated)
   }
 
@@ -65,7 +67,8 @@ export default function FlightChart({ chartType }) {
           <Tooltip />
           <CartesianGrid strokeDasharray='3 3' />
           <XAxis dataKey='time' interval='preserveStartEnd' minTickGap={30} />
-          <YAxis dataKey={chartType} />
+          <YAxis />
+          <Tooltip />
           <Area type='monotone' dataKey={chartType} stroke='#8884d8' fill='#8884d8' />
           {/* <Brush dataKey={chartType} height={20} stroke="#8884d8" /> */}
         </AreaChart>
