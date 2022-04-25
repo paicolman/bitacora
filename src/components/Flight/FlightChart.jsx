@@ -1,16 +1,16 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, useRef } from 'react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Brush } from 'recharts';
 import { FlightContext } from '../../contexts/FlightContext'
 
 export default function FlightChart({ chartType }) {
   const [data, setData] = useState(null)
   const { eventBus, diffData } = useContext(FlightContext)
+  const isMounted = useRef(false)
 
   useEffect(() => {
     eventBus.on('newFile', () => {
       setData(null)
     })
-
     eventBus.on('igcParsed', (igc) => {
       if (chartType === 'pressureAltitude') {
         decimate(igc.fixes, chartType)
@@ -18,15 +18,19 @@ export default function FlightChart({ chartType }) {
         decimate(diffData, chartType)
       }
     })
+    isMounted.current = true
+    return (() => {
+      isMounted.current = false
+      eventBus.remove('newFile', () => { console.log('removed listener for newFile') })
+      eventBus.remove('igcParsed', () => { console.log('removed listener for igcParsed') })
+    })
   }, [])
 
   function decimate(flightData, chartType) {
-    console.log(chartType)
     const dataPointsToDisplay = 800
     const reductionRate = Math.floor(flightData.length / dataPointsToDisplay)
     let decimated = []
     if (reductionRate === 0) {
-      console.log(flightData)
       setData(flightData)
       return
     }
@@ -40,10 +44,9 @@ export default function FlightChart({ chartType }) {
         value[chartType] += flightData[counter + i][chartType]
 
       }
-      value[chartType] = (value[chartType] / reductionRate).toFixed(2)
+      value[chartType] = Math.round((value[chartType] / reductionRate) * 100) / 100
       decimated.push(value)
     }
-    console.log(decimated)
     setData(decimated)
   }
 
@@ -70,7 +73,7 @@ export default function FlightChart({ chartType }) {
           <YAxis />
           <Tooltip />
           <Area type='monotone' dataKey={chartType} stroke='#8884d8' fill='#8884d8' />
-          {/* <Brush dataKey={chartType} height={20} stroke="#8884d8" /> */}
+          <Brush dataKey={chartType} height={20} stroke="#8884d8" />
         </AreaChart>
       </ResponsiveContainer>
 

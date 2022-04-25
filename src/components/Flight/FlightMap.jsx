@@ -22,11 +22,15 @@ export default function FlightMap() {
         setMarkerPos([lat, lon])
       }
     })
+    return (() => {
+      eventBus.remove('newFile', () => { console.log('removed listener for newFile') })
+      eventBus.remove('mouseOnChart', () => { console.log('removed listener for mouseOnChart') })
+    })
   }, [])
 
   return (
     <>
-      <div id='map' style={{ width: '100%', height: '600px', border: '3px solid black' }}>
+      <div id='map' style={{ width: '100%', height: '500px', border: '3px solid black' }}>
         <MapContainer center={position} zoom={13} scrollWheelZoom={false}>
           <TileLayer
             url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'

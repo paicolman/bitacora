@@ -32,7 +32,7 @@ export default function BulkUploadDropzone() {
   return (
     <>
       <Container className='text-center'>
-        <AppHeader props={{ home: true, logoutUser: true }} />
+        <AppHeader props={{ home: true, book: true, logoutUser: true }} />
         <h2>Bulk upload</h2>
         <Card>
           <Card.Title className='text-center'>

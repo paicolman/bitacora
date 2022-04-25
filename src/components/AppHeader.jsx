@@ -22,12 +22,18 @@ export default function AppHeader({ props }) {
     setGoBack(<Navigate to='/' />)
   }
 
+  function handleBook() {
+    setGoBack(<Navigate to='/book' />)
+  }
+
   function setLink() {
     let home = <></>
+    let book = <></>
     let loginLogout = <></>
     if (props) {
 
       home = props.home ? <button className='btn btn-link' onClick={handleHome}>Home</button> : <></>
+      book = props.book ? <button className='btn btn-link' onClick={handleBook}>Flight Book</button> : <></>
       loginLogout = props.logoutUser ? <button className='btn btn-link' onClick={handleLogout}>Log-out</button> : <Link to='/login'>Log-in</Link>
     } else {
       loginLogout = <button className='btn btn-link' onClick={handleLogout}>Log-out</button>
@@ -35,6 +41,7 @@ export default function AppHeader({ props }) {
     return (
       <>
         {home}
+        {book}
         {loginLogout}
       </>
     )

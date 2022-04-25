@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import app from '../firebase'
 import { getDatabase, onValue, ref, set } from 'firebase/database'
-import { getStorage, ref as storageRef, deleteObject } from 'firebase/storage'
+import { getStorage, ref as storageRef, deleteObject, getDownloadURL, getResult } from 'firebase/storage'
 import PleaseWait from '../components/PleaseWait'
 
 export const DbFlightContext = React.createContext()
@@ -41,12 +41,11 @@ export default function DbFlightContextProvider({ children }) {
       })
       setFlights(combined.sort((a, b) => (a.flightData.flightDate > b.flightData.flightDate ? 1 : -1)))
     })
-    // unsubscribe.apply() //! How to unsubscribe?
+    unsubscribe.apply() //! How to unsubscribe?
   }
 
   function sortFlights(sortBy, ascending) {
     let sorted = []
-    console.log(sortBy)
     switch (sortBy) {
       case 'date':
         sorted = ascending ?
@@ -99,6 +98,7 @@ export default function DbFlightContextProvider({ children }) {
 
   function getNextFlight() {
     if (flights.length > 0) {
+      // console.log(flights)
       const flightIndex = flights.findIndex(flight => flight.flightId === activeFlight.flightId)
       if (flightIndex < flights.length - 1) {
         setActiveFlight(flights[flightIndex + 1])
@@ -148,6 +148,21 @@ export default function DbFlightContextProvider({ children }) {
     }
   }
 
+  function downloadIGC() {
+    if (activeFlight.flightData.hasIgc) {
+      const storage = getStorage()
+      const igcRef = storageRef(storage, `${currentUser.uid}/igc/${activeFlight.flightId}.igc`)
+      getDownloadURL(igcRef)
+        .then((igcUrl) => {
+          const link = document.createElement("a")
+          link.href = igcUrl;
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        })
+    }
+  }
+
   const dbFlightContextValue = {
     dbEventBus,
     flights,
@@ -158,7 +173,8 @@ export default function DbFlightContextProvider({ children }) {
     deleteFlight,
     getFirstFlight,
     getNextFlight,
-    getPreviousFlight
+    getPreviousFlight,
+    downloadIGC
   }
 
   return (

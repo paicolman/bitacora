@@ -39,7 +39,7 @@ export default function PilotDashboard({ newPilot }) {
               <Card className='text-center'>
                 <Card.Header><h3>Your Equipment</h3></Card.Header>
                 <Card.Title>
-                  Here you can find all your gadgets and gimmicks...
+                  Here you can find all your gadgets and gimmicks...(Not implemented yet)
                 </Card.Title>
               </Card>
             </Col>

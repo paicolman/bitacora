@@ -15,7 +15,8 @@ export default function FlightButtons({ props }) {
   }
 
   function handleGoBook() {
-    setGoBack(<Navigate to='/book' />)
+    // setGoBack(<Navigate to='/book' />)
+    props.showList()
   }
 
   function handleClearData() {

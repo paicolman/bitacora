@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { Form, Col, Container, Row, Card, FloatingLabel, Image, Badge } from 'react-bootstrap'
+import { Form, Col, Container, Row, Card, FloatingLabel, Image, Badge, Accordion } from 'react-bootstrap'
 import DropzoneFlight from './DropzoneFlight'
 import FlightMap from './FlightMap'
 import { FlightContext } from '../../contexts/FlightContext'
@@ -16,8 +16,8 @@ import FlightButtons from './FlightButtons'
 import ShowDbLaunchOrLanding from './ShowDbLaunchOrLanding'
 import ConfirmationDialog from './ConfirmationDialog'
 
-export default function FlightContainer({ newFlight }) {
-  const { activeFlight, deleteFlight, getNextFlight, getFirstFlight } = useContext(DbFlightContext)
+export default function FlightContainer({ newFlight, showList }) {
+  const { activeFlight, deleteFlight, getNextFlight, getFirstFlight, downloadIGC } = useContext(DbFlightContext)
   const { eventBus, flightSpecs, setLaunchOrLandingName, saveFlightData, getExistingFlightId, loadIgcFromDB } = useContext(FlightContext)
   const { dbEventBus } = useContext(DbFlightContext)
   const launchTime = useRef()
@@ -31,7 +31,8 @@ export default function FlightContainer({ newFlight }) {
   const startLandingDistRef = useRef()
   const flightTypeRef = useRef()
   const flightCommentsRef = useRef()
-  const duplicateFlightId = useRef()
+  const hasIgc = useRef(false)
+  const isMounted = useRef(false)
   const [duration, setDuration] = useState('00:00:00')
   const [flightDate, setFlightDate] = useState('yyyy-MM-dd')
   const [maxHeight, setMaxHeight] = useState(0)
@@ -44,6 +45,7 @@ export default function FlightContainer({ newFlight }) {
 
   useEffect(() => {
     eventBus.on('igcParsed', (igc) => {
+      hasIgc.current = true
       if (newFlight) {
         setImage('assets/has_igc.png')
         clearCurrentData()
@@ -89,27 +91,32 @@ export default function FlightContainer({ newFlight }) {
       }
     }
     dbEventBus.on('switchActiveFlight', (switchedFlight) => {
-      launchTime.current.value = switchedFlight.flightData.launchTime
-      launchHeight.current.value = switchedFlight.flightData.launchHeight
-      landingTime.current.value = switchedFlight.flightData.landingTime
-      maxSpeedRef.current.value = switchedFlight.flightData.maxSpeed.toFixed(2)
-      maxClimbRef.current.value = switchedFlight.flightData.maxClimb.toFixed(2)
-      maxSinkRef.current.value = switchedFlight.flightData.maxSink.toFixed(2)
-      maxDistanceRef.current.value = switchedFlight.flightData.maxDist.toFixed(2)
-      pathLengthRef.current.value = switchedFlight.flightData.pathLength.toFixed(2)
-      startLandingDistRef.current.value = switchedFlight.flightData.launchLandingDist.toFixed(2)
-      flightTypeRef.current.value = switchedFlight.flightData.flightType
-      flightCommentsRef.current.value = switchedFlight.flightData.comments
-      setFlightDate(switchedFlight.flightData.flightDate)
-      setDuration(switchedFlight.flightData.duration)
-      setMaxHeight(switchedFlight.flightData.maxHeight)
-      setLaunchOrLandingName({ type: 'Launch:', name: switchedFlight.flightData.launchName })
-      setLaunchOrLandingName({ type: 'Landing:', name: switchedFlight.flightData.landingName })
-      if (switchedFlight.flightData.hasIgc) {
-        loadIgcFromDB(switchedFlight.flightId)
+      if (isMounted.current) {
+        launchTime.current.value = switchedFlight.flightData.launchTime
+        launchHeight.current.value = switchedFlight.flightData.launchHeight
+        landingTime.current.value = switchedFlight.flightData.landingTime
+        maxSpeedRef.current.value = switchedFlight.flightData.maxSpeed.toFixed(2)
+        maxClimbRef.current.value = switchedFlight.flightData.maxClimb.toFixed(2)
+        maxSinkRef.current.value = switchedFlight.flightData.maxSink.toFixed(2)
+        maxDistanceRef.current.value = switchedFlight.flightData.maxDist.toFixed(2)
+        pathLengthRef.current.value = switchedFlight.flightData.pathLength.toFixed(2)
+        startLandingDistRef.current.value = switchedFlight.flightData.launchLandingDist.toFixed(2)
+        flightTypeRef.current.value = switchedFlight.flightData.flightType
+        flightCommentsRef.current.value = switchedFlight.flightData.comments
+        setFlightDate(switchedFlight.flightData.flightDate)
+        setDuration(switchedFlight.flightData.duration)
+        setMaxHeight(switchedFlight.flightData.maxHeight)
+        setLaunchOrLandingName({ type: 'Launch:', name: switchedFlight.flightData.launchName })
+        setLaunchOrLandingName({ type: 'Landing:', name: switchedFlight.flightData.landingName })
+        if (switchedFlight.flightData.hasIgc) {
+          loadIgcFromDB(switchedFlight.flightId)
+        }
       }
     })
+    isMounted.current = true
+
     return (() => {
+      isMounted.current = false
       eventBus.remove('igcParsed', () => { console.log('removed listener for igcParsed') })
       eventBus.remove('newDate', () => { console.log('removed listener for newDate') })
       dbEventBus.remove('switchActiveFlight', () => { console.log('removed listener for switchActiveFlight') })
@@ -189,7 +196,7 @@ export default function FlightContainer({ newFlight }) {
             <Image className='igc-image pb-1' src='assets/has_igc.png' />
           </Row>
           <Row>
-            <Badge pill bg='primary' >Replace / Delete</Badge>
+            <Badge pill bg='primary' onClick={downloadIGC}>Download</Badge>
           </Row>
         </>
       )
@@ -235,17 +242,6 @@ export default function FlightContainer({ newFlight }) {
       )
     }
   }
-
-  // function handleUpdateFlight() {
-  //   const props = {
-  //     show: true,
-  //     title: `Update Flight from ${activeFlight.flightData.flightDate}`,
-  //     text: `Are you sure you want to update the flight from ${activeFlight.flightData.flightDate} with the actual data?`,
-  //     action: 'Update this flight',
-  //     confirm: handleSaveFlight
-  //   }
-  //   setShowConfirmDlg(<ConfirmationDialog props={props} />)
-  // }
 
   async function handleSaveFlight() {
     const dataToSave = {
@@ -337,14 +333,15 @@ export default function FlightContainer({ newFlight }) {
     setImage,
     disabledSave,
     newFlight,
-    handleDelete
+    handleDelete,
+    showList
   }
 
   return (
     <>
       <Container>
         {showConfirmDlg}
-        <AppHeader props={{ home: true, logoutUser: true }} />
+        <AppHeader props={{ home: true, book: true, logoutUser: true }} />
         <Row>
           {showDropzoneOrIgcIcon()}
         </Row>
@@ -360,96 +357,104 @@ export default function FlightContainer({ newFlight }) {
           </Col>
         </Row>
         <Row className='p-3'>
-
           <FlightButtons props={buttonProps} />
         </Row>
-        <Row>
-          <Col sm>
-            <SelectGliders gliderIdFromDB={gliderIdFromDB()} />
-          </Col>
-          <Col sm>
-            <Row className='p-2'>
-              <Col>
-                {showLaunch()}
-              </Col>
-            </Row>
-            <Row className='p-2'>
-              <Col>
-                {showLanding()}
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-        <Row className='pt-2'>
-          <Col sm>
-            <FloatingLabel label='Launch Time:'>
-              <Form.Control id='launchtime' type='time' ref={launchTime} onChange={calculateDurationManually} />
-            </FloatingLabel>
-          </Col>
-          <Col sm>
-            <FloatingLabel label='Landing Time:'>
-              <Form.Control id='landingtime' type='time' ref={landingTime} onChange={calculateDurationManually} />
-            </FloatingLabel>
-          </Col>
-          <Col sm>
-            <FloatingLabel label='Start Height (m):'>
-              <Form.Control id='st-height' type='number' placeholder='Start Height' ref={launchHeight} />
-            </FloatingLabel>
-          </Col>
-          <Col sm>
-            <FloatingLabel controlId='flightType' label='Flight type:'>
-              <Form.Select id='flightType' ref={flightTypeRef}>
-                <option value='top-down' >Top-down flight</option>
-                <option value='thermal' >Soaring / thermal flight</option>
-                <option value='x-country' >Cross-country</option>
-              </Form.Select>
-            </FloatingLabel>
-          </Col>
-        </Row>
-        <Row className='pt-2'>
-          <Col>
-            <FloatingLabel label='Max Speed (kmh):'>
-              <Form.Control id='speed' type='number' placeholder='Max. Speed' ref={maxSpeedRef} />
-            </FloatingLabel>
-          </Col>
-          <Col>
-            <FloatingLabel label='Max Climb (m/s):'>
-              <Form.Control id='climb' type='number' placeholder='Max Climb' ref={maxClimbRef} />
-            </FloatingLabel>
-          </Col>
-          <Col>
-            <FloatingLabel label='Max Sink (m/s):'>
-              <Form.Control id='sink' type='number' placeholder='Max Sink' ref={maxSinkRef} />
-            </FloatingLabel>
-          </Col>
-        </Row>
-        <Row className='pt-2' >
-          <Col sm>
-            <FloatingLabel label='Max dist. from start (km):'>
-              <Form.Control id='maxDist' type='number' placeholder='Max dist. from start' ref={maxDistanceRef} />
-            </FloatingLabel>
-          </Col>
-          <Col sm>
-            <FloatingLabel label='Dist Launch Landing (km):'>
-              <Form.Control id='path' type='number' placeholder='Dist Launch Landing' ref={startLandingDistRef} />
-            </FloatingLabel>
-          </Col>
-          <Col sm>
-            <FloatingLabel label='Path Length (km):'>
-              <Form.Control id='path' type='number' placeholder='Path Length' ref={pathLengthRef} />
-            </FloatingLabel>
-          </Col>
-        </Row>
-        <Row className='pt-2'>
-          <Col sm>
-            <FloatingLabel label='Flight Comments:'>
-              <Form.Control as='textarea' rows={6} placeholder='Flight Comments' ref={flightCommentsRef} />
-            </FloatingLabel>
-          </Col>
-        </Row>
+        <Accordion>
+          <Accordion.Item eventKey='1'>
+            <Accordion.Header>Flight Data</Accordion.Header>
+            <Accordion.Body>
+
+              <Row>
+                <Col sm>
+                  <SelectGliders gliderIdFromDB={gliderIdFromDB()} />
+                </Col>
+                <Col sm>
+                  <Row className='p-2'>
+                    <Col>
+                      {showLaunch()}
+                    </Col>
+                  </Row>
+                  <Row className='p-2'>
+                    <Col>
+                      {showLanding()}
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Row className='pt-2'>
+                <Col sm>
+                  <FloatingLabel label='Launch Time:'>
+                    <Form.Control id='launchtime' type='time' ref={launchTime} onChange={calculateDurationManually} />
+                  </FloatingLabel>
+                </Col>
+                <Col sm>
+                  <FloatingLabel label='Landing Time:'>
+                    <Form.Control id='landingtime' type='time' ref={landingTime} onChange={calculateDurationManually} />
+                  </FloatingLabel>
+                </Col>
+                <Col sm>
+                  <FloatingLabel label='Start Height (m):'>
+                    <Form.Control id='st-height' type='number' placeholder='Start Height' ref={launchHeight} />
+                  </FloatingLabel>
+                </Col>
+                <Col sm>
+                  <FloatingLabel controlId='flightType' label='Flight type:'>
+                    <Form.Select id='flightType' ref={flightTypeRef}>
+                      <option value='top-down' >Top-down flight</option>
+                      <option value='thermal' >Soaring / thermal flight</option>
+                      <option value='x-country' >Cross-country</option>
+                    </Form.Select>
+                  </FloatingLabel>
+                </Col>
+              </Row>
+              <Row className='pt-2'>
+                <Col>
+                  <FloatingLabel label='Max Speed (kmh):'>
+                    <Form.Control id='speed' type='number' placeholder='Max. Speed' ref={maxSpeedRef} />
+                  </FloatingLabel>
+                </Col>
+                <Col>
+                  <FloatingLabel label='Max Climb (m/s):'>
+                    <Form.Control id='climb' type='number' placeholder='Max Climb' ref={maxClimbRef} />
+                  </FloatingLabel>
+                </Col>
+                <Col>
+                  <FloatingLabel label='Max Sink (m/s):'>
+                    <Form.Control id='sink' type='number' placeholder='Max Sink' ref={maxSinkRef} />
+                  </FloatingLabel>
+                </Col>
+              </Row>
+              <Row className='pt-2' >
+                <Col sm>
+                  <FloatingLabel label='Max dist. from start (km):'>
+                    <Form.Control id='maxDist' type='number' placeholder='Max dist. from start' ref={maxDistanceRef} />
+                  </FloatingLabel>
+                </Col>
+                <Col sm>
+                  <FloatingLabel label='Dist Launch Landing (km):'>
+                    <Form.Control id='path' type='number' placeholder='Dist Launch Landing' ref={startLandingDistRef} />
+                  </FloatingLabel>
+                </Col>
+                <Col sm>
+                  <FloatingLabel label='Path Length (km):'>
+                    <Form.Control id='path' type='number' placeholder='Path Length' ref={pathLengthRef} />
+                  </FloatingLabel>
+                </Col>
+              </Row>
+              <Row className='pt-2'>
+                <Col sm>
+                  <FloatingLabel label='Flight Comments:'>
+                    <Form.Control as='textarea' rows={6} placeholder='Flight Comments' ref={flightCommentsRef} />
+                  </FloatingLabel>
+                </Col>
+              </Row>
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
         <Row className='pt-4'>
           <Col sm>
-            <Card><Card.Header>Track</Card.Header>
+            <Card>
+              <Card.Header>Flight Track</Card.Header>
               <Card.Body>
                 <FlightMap />
               </Card.Body>

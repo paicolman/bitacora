@@ -4,7 +4,7 @@ import { getRhumbLineBearing, getDistance, getPathLength } from 'geolib'
 import { useAuth } from '../contexts/AuthContext'
 import app from '../firebase'
 import { getDatabase, onValue, ref, set } from 'firebase/database'
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, updateMetadata } from 'firebase/storage'
 import uuid from 'react-uuid'
 import PleaseWait from '../components/PleaseWait'
 
@@ -13,6 +13,8 @@ export const FlightContext = React.createContext()
 export default function FlightContextProvider({ children }) {
   const [pleaseWait, setPleaseWait] = useState(null)
   const { currentUser } = useAuth()
+  const hSpeedAvgRate = 50
+  const vSpeedAvgRate = 20
 
   const diffData = []
   let isThermalFlight = false
@@ -58,7 +60,6 @@ export default function FlightContextProvider({ children }) {
     parseIgcFile(igcFile).then((igc) => {
       if (igc) {
         igcFileForDB = igcFile
-        console.log('parsing...')
         eventBus.dispatch('igcParsed', igc)
       }
     }).catch(e => {
@@ -81,7 +82,7 @@ export default function FlightContextProvider({ children }) {
   function loadIgcFromDB(igcId) {
     setPleaseWait(<PleaseWait />)
     const storage = getStorage()
-    getDownloadURL(storageRef(storage, `${currentUser.uid}/igc/${igcId}`))
+    getDownloadURL(storageRef(storage, `${currentUser.uid}/igc/${igcId}.igc`))
       .then((igcUrl) => {
         const xhr = new XMLHttpRequest()
         xhr.responseType = 'blob'
@@ -187,17 +188,17 @@ export default function FlightContextProvider({ children }) {
         const deltaT = ((fix.timestamp - prevFix.timestamp) / 1000)
         const vSpeed = (fix.pressureAltitude - prevFix.pressureAltitude) / deltaT
         const bear = getRhumbLineBearing(fix, prevFix)
-        const hSpeed = getDistance(fix, prevFix) * 3.6 // kmh
+        const hSpeed = Math.round(getDistance(fix, prevFix) * 3.6 * 100) / 100
 
         prevHspeeds.push(hSpeed)
-        if (idx > 30) {
+        if (idx > hSpeedAvgRate) {
           prevHspeeds.shift()
         }
-        avgHspeed = ((prevHspeeds.reduce((tot, elem) => { return (tot + elem) })) / prevHspeeds.length) / 3.6
+        avgHspeed = ((prevHspeeds.reduce((tot, elem) => { return (tot + elem) })) / prevHspeeds.length)
         flightSpecs.maxSpeed = flightSpecs.maxSpeed > avgHspeed ? flightSpecs.maxSpeed : avgHspeed
 
         prevVspeeds.push(vSpeed)
-        if (idx > 30) {
+        if (idx > vSpeedAvgRate) {
           prevVspeeds.shift()
         }
         avgVspeed = (prevVspeeds.reduce((tot, elem) => { return (tot + elem) })) / prevVspeeds.length
@@ -305,7 +306,7 @@ export default function FlightContextProvider({ children }) {
 
   function storeIgc(uniqueId) {
     const storage = getStorage()
-    const igcRef = storageRef(storage, `${currentUser.uid}/igc/${uniqueId}`)
+    const igcRef = storageRef(storage, `${currentUser.uid}/igc/${uniqueId}.igc`)
     uploadBytes(igcRef, igcFileForDB).then((snapshot) => {
     })
   }
